@@ -231,7 +231,7 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
     case 'G': switch (parser.codenum) {
 
       case 0: case 1: G0_G1(                                      // G0: Fast Move, G1: Linear Move
-                        #if IS_SCARA || defined(G0_FEEDRATE)
+                        #if IS_SCARA || IS_DEXARM || defined(G0_FEEDRATE)
                           parser.codenum == 0
                         #endif
                       );
@@ -529,6 +529,23 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
       case 119: M119(); break;                                    // M119: Report endstop states
       case 120: M120(); break;                                    // M120: Enable endstops
       case 121: M121(); break;                                    // M121: Disable endstops
+
+      case 888: M888(); break;        
+      case 889: M889(); break;                                    // M889
+      case 890: M890(); break;                                    // M890
+      case 891: M891(); break;                                    // M891
+      case 892: M892(); break;                                    // M892
+      case 893: M893(); break;                                    // M893
+      case 894: M894(); break;                                    // M894
+      case 1111: M1111(); break;                                    // M1111
+      case 1112: M1112(); break;                                    // M1112
+      case 1113: M1113(); break;                                    // M1113
+      case 2002: M2002(); break;                                    // M2002
+      case 2003: M2003(); break;                                    // M2003
+      case 2004: M2004(); break;                                    // M2004
+      case 2007: M2007(); break;                                    // M2007
+      case 2010: M2010(); break;                                    // M2010
+      case 2011: M2011(); break;                                    // M2011
 
       #if HOTENDS && HAS_LCD_MENU
         case 145: M145(); break;                                  // M145: Set material heatup parameters

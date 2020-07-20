@@ -181,6 +181,8 @@
   #include "libs/L64XX/L64XX_Marlin.h"
 #endif
 
+#include "../../module/dexarm/dexarm.h"
+
 const char NUL_STR[] PROGMEM = "",
            M112_KILL_STR[] PROGMEM = "M112 Shutdown",
            G28_STR[] PROGMEM = "G28",
@@ -1158,6 +1160,10 @@ void setup() {
   #endif
 
   marlin_state = MF_RUNNING;
+
+  position_sensor_init();
+  check_update_flag();
+  module_position_init();
 
   SETUP_LOG("setup() completed.");
 }

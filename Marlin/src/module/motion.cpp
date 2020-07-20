@@ -74,6 +74,7 @@
 #define DEBUG_OUT ENABLED(DEBUG_LEVELING_FEATURE)
 #include "../core/debug_out.h"
 
+ #include "./dexarm/dexarm.h"
 #define XYZ_CONSTS(T, NAME, OPT) const PROGMEM XYZval<T> NAME##_P = { X_##OPT, Y_##OPT, Z_##OPT }
 
 XYZ_CONSTS(float, base_min_pos,   MIN_POS);
@@ -258,6 +259,7 @@ void report_current_position() {
 void report_current_position_projected() {
   report_logical_position(current_position);
   stepper.report_a_position(planner.position);
+  report_more_positions();
 }
 
 /**
@@ -360,7 +362,9 @@ void line_to_current_position(const feedRate_t &fr_mm_s/*=feedrate_mm_s*/) {
       ubl.line_to_destination_segmented(scaled_fr_mm_s);
     #else
       if (current_position == destination) return;
-
+    #if IS_DEXARM
+      if (!dexarm_position_is_reachable(destination)) return;
+    #endif
       planner.buffer_line(destination, scaled_fr_mm_s, active_extruder);
     #endif
 
@@ -765,7 +769,11 @@ FORCE_INLINE void segment_idle(millis_t &next_idle_ms) {
     }
 
     // Fail if attempting move outside printable radius
-    if (!position_is_reachable(destination)) return true;
+    #if IS_DEXARM
+      if (!dexarm_position_is_reachable(destination)) return true;
+    #else
+      if (!position_is_reachable(destination)) return true;
+    #endif
 
     // Get the linear distance in XYZ
     float cartesian_mm = diff.magnitude();
@@ -1059,7 +1067,7 @@ FORCE_INLINE void segment_idle(millis_t &next_idle_ms) {
  * Before exit, current_position is set to destination.
  */
 void prepare_line_to_destination() {
-  apply_motion_limits(destination);
+  //apply_motion_limits(destination);
 
   #if EITHER(PREVENT_COLD_EXTRUSION, PREVENT_LENGTHY_EXTRUDE)
 

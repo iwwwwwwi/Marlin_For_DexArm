@@ -54,7 +54,7 @@
 #if HAS_CUTTER
   #include "../feature/spindle_laser.h"
 #endif
-
+#include "./dexarm/dexarm.h"
 // Feedrate for manual moves
 #ifdef MANUAL_FEEDRATE
   constexpr xyze_feedrate_t _mf = MANUAL_FEEDRATE,
@@ -632,6 +632,7 @@ class Planner {
 
       // Allow do_homing_move to access internal functions, such as buffer_segment.
       friend void do_homing_move(const AxisEnum, const float, const feedRate_t);
+      friend void rotate_angle_diff(abc_float_t &angle_abc);
   #endif
 
     /**

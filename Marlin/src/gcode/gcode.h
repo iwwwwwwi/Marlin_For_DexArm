@@ -391,7 +391,7 @@ public:
 private:
 
   static void G0_G1(
-    #if IS_SCARA || defined(G0_FEEDRATE)
+    #if IS_SCARA || IS_DEXARM || defined(G0_FEEDRATE)
       const bool fast_move=false
     #endif
   );
@@ -628,6 +628,23 @@ private:
   static void M119();
   static void M120();
   static void M121();
+
+  static void M888();
+  static void M889();
+  static void M890();
+  static void M891();
+  static void M892();
+  static void M893();
+  static void M894();
+  static void M1111();
+  static void M1112();
+  static void M1113();
+  static void M2002();
+  static void M2003();
+  static void M2004();
+  static void M2007();
+  static void M2010();
+  static void M2011();
 
   #if ENABLED(PARK_HEAD_ON_PAUSE)
     static void M125();

@@ -210,7 +210,7 @@ void plan_arc(
     #endif
     raw.e += extruder_per_segment;
 
-    apply_motion_limits(raw);
+    //apply_motion_limits(raw);
 
     #if HAS_LEVELING && !PLANNER_LEVELING
       planner.apply_leveling(raw);
@@ -230,7 +230,7 @@ void plan_arc(
     raw[l_axis] = start_L;
   #endif
 
-  apply_motion_limits(raw);
+  //apply_motion_limits(raw);
 
   #if HAS_LEVELING && !PLANNER_LEVELING
     planner.apply_leveling(raw);

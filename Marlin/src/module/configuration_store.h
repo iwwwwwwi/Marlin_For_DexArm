@@ -54,7 +54,7 @@ class MarlinSettings {
 
     #if ENABLED(EEPROM_SETTINGS)
 
-      static bool load();      // Return 'true' if data was loaded ok
+      static bool load(bool need_postprocess = true);      // Return 'true' if data was loaded ok
       static bool validate();  // Return 'true' if EEPROM data is ok
 
       static inline void first_load() {
@@ -101,7 +101,7 @@ class MarlinSettings {
                                           // live at the very end of the eeprom
       #endif
 
-      static bool _load();
+      static bool _load(bool need_postprocess = true);
       static bool size_error(const uint16_t size);
     #endif
 };

@@ -45,7 +45,7 @@ extern xyze_pos_t destination;
  * G0, G1: Coordinated movement of X Y Z E axes
  */
 void GcodeSuite::G0_G1(
-  #if IS_SCARA || defined(G0_FEEDRATE)
+  #if IS_SCARA || IS_DEXARM || defined(G0_FEEDRATE)
     const bool fast_move/*=false*/
   #endif
 ) {
@@ -99,7 +99,7 @@ void GcodeSuite::G0_G1(
 
     #endif // FWRETRACT
 
-    #if IS_SCARA
+    #if IS_SCARA || IS_DEXARM
       fast_move ? prepare_fast_move_to_destination() : prepare_line_to_destination();
     #else
       prepare_line_to_destination();

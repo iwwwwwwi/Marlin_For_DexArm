@@ -132,6 +132,8 @@
   #include "../feature/caselight.h"
 #endif
 
+#include "../module/dexarm/dexarm.h"
+
 #pragma pack(push, 1) // No padding between variables
 
 typedef struct { uint16_t X, Y, Z, X2, Y2, Z2, Z3, Z4, E0, E1, E2, E3, E4, E5; } tmc_stepper_current_t;
@@ -388,6 +390,11 @@ typedef struct SettingsDataStruct {
     uint8_t case_light_brightness;
   #endif
 
+  //Dexarm config
+  int calibration_position_sensor_value[3];
+  float x_axis_scaling_factor;
+  float y_axis_scaling_factor;
+  float front_module_offset;
 } SettingsData;
 
 //static_assert(sizeof(SettingsData) <= E2END + 1, "EEPROM too small to contain SettingsData!");
@@ -1332,6 +1339,19 @@ void MarlinSettings::postprocess() {
       EEPROM_WRITE(case_light_brightness);
     #endif
 
+    //dexarm_config
+    _FIELD_TEST(calibration_position_sensor_value);
+    EEPROM_WRITE(calibration_position_sensor_value);
+
+    _FIELD_TEST(x_axis_scaling_factor);
+    EEPROM_WRITE(x_axis_scaling_factor);
+
+    _FIELD_TEST(y_axis_scaling_factor);
+    EEPROM_WRITE(y_axis_scaling_factor);
+
+    _FIELD_TEST(front_module_offset);
+    EEPROM_WRITE(front_module_offset);
+
     //
     // Validate CRC and Data Size
     //
@@ -1371,7 +1391,7 @@ void MarlinSettings::postprocess() {
   /**
    * M501 - Retrieve Configuration
    */
-  bool MarlinSettings::_load() {
+  bool MarlinSettings::_load(bool need_postprocess) {
     uint16_t working_crc = 0;
 
     EEPROM_START();
@@ -2194,6 +2214,19 @@ void MarlinSettings::postprocess() {
         EEPROM_READ(case_light_brightness);
       #endif
 
+      //dexarm_config
+      _FIELD_TEST(calibration_position_sensor_value);
+      EEPROM_READ(calibration_position_sensor_value);
+
+      _FIELD_TEST(x_axis_scaling_factor);
+      EEPROM_READ(x_axis_scaling_factor);
+
+      _FIELD_TEST(y_axis_scaling_factor);
+      EEPROM_READ(y_axis_scaling_factor);
+
+      _FIELD_TEST(front_module_offset);
+      EEPROM_READ(front_module_offset);
+
       eeprom_error = size_error(eeprom_index - (EEPROM_OFFSET));
       if (eeprom_error) {
         DEBUG_ECHO_START();
@@ -2216,7 +2249,9 @@ void MarlinSettings::postprocess() {
         DEBUG_ECHOLNPAIR(" stored settings retrieved (", eeprom_index - (EEPROM_OFFSET), " bytes; crc ", (uint32_t)working_crc, ")");
       }
 
-      if (!validating && !eeprom_error) postprocess();
+      if(need_postprocess){
+        if (!validating && !eeprom_error) postprocess();
+      }
 
       #if ENABLED(AUTO_BED_LEVELING_UBL)
         if (!validating) {
@@ -2280,9 +2315,9 @@ void MarlinSettings::postprocess() {
     return success;
   }
 
-  bool MarlinSettings::load() {
+  bool MarlinSettings::load(bool need_postprocess) {
     if (validate()) {
-      const bool success = _load();
+      const bool success = _load(need_postprocess);
       #if ENABLED(EXTENSIBLE_UI)
         ExtUI::onConfigurationStoreRead(success);
       #endif
@@ -3680,6 +3715,18 @@ void MarlinSettings::reset() {
         #endif
       );
     #endif
+
+    //Dexarm config
+    CONFIG_ECHO_START();
+    SERIAL_ECHOLNPAIR(
+      "  M889 X", calibration_position_sensor_value[0]
+      , " Y", calibration_position_sensor_value[1]
+      , " Z", calibration_position_sensor_value[2]
+    );
+
+    CONFIG_ECHO_START();
+    SERIAL_ECHOLNPAIR("FRONT_MODULE_OFFSET", front_module_offset);
+    print_current_module_type();
   }
 
 #endif // !DISABLE_M503

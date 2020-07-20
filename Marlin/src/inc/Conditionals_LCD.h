@@ -31,6 +31,9 @@
   #define IS_KINEMATIC 1
 #elif ENABLED(DELTA)
   #define IS_KINEMATIC 1
+#elif ENABLED(DEXARM)
+  #define IS_DEXARM 1
+  #define IS_KINEMATIC 1
 #else
   #define IS_CARTESIAN 1
 #endif
