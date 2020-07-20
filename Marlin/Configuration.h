@@ -68,6 +68,25 @@
 // config/examples/SCARA and customize for your machine.
 //
 
+/**
+ * 
+ * About Rotrics DexArm
+ * Official Website:           https://rotrics.com
+ * Rotrics Arm Diagram:        https://manual.rotrics.com/product-profile/rotrics-arm-diagram
+ * DexArm's Coordinate System: https://manual.rotrics.com/product-profile/robot-arm-coordinate-system
+ *
+ */
+
+#define DEXARM
+
+#if ENABLED(DEXARM)
+  #define SCARA_SEGMENTS_PER_SECOND 200
+#endif
+
+//===========================================================================
+//==================== END ==== SCARA Printer ==== END ======================
+//===========================================================================
+
 // @section info
 
 // Author info of this build printed to the host during boot and M115
