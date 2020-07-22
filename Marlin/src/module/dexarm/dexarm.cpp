@@ -420,19 +420,19 @@ bool dexarm_position_is_reachable(const xyz_pos_t &position)
 
 	if (z > ZMAXARM || z < ZMINARM)
 	{
-		MYSERIAL0.println("Z beyound limit.....");
+		MYSERIAL0.println("Z beyond limit.....");
 		return false;
 	}
 
 	if (y < 0)
 	{
-		MYSERIAL0.println("Y beyound limit.....");
+		MYSERIAL0.println("Y beyond limit.....");
 		return false;
 	}
 
 	if (tmps < ARMLIMIT[tmp_z * 2 + 1] + 1 || tmps > ARMLIMIT[tmp_z * 2] - 1)
 	{
-		MYSERIAL0.println("XY beyound limit.....");
+		MYSERIAL0.println("XY beyond limit.....");
 		return false;
 	}
 	return true;
