@@ -201,8 +201,8 @@ void GcodeSuite::M1112()
 	}
 	else
 	{
-		position[X_AXIS] = 0;
-		position[Y_AXIS] = 300;
+		position[X_AXIS] = 300;
+		position[Y_AXIS] = 0;
 		position[Z_AXIS] = 0;
 		m1112_position(position);
 	}
@@ -223,8 +223,8 @@ void GcodeSuite::M1113()
 	}
 	else
 	{
-		position[X_AXIS] = 0;
-		position[Y_AXIS] = 300;
+		position[X_AXIS] = 300;
+		position[Y_AXIS] = 0;
 		position[Z_AXIS] = 0;
 		m1113_position(position);
 	}

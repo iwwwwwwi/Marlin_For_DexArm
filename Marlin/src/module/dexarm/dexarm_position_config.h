@@ -11,8 +11,8 @@
 #define CAMERA_MODULE_OFFSET 107.7
 
 #define START_A_ANGLE 90.0
-#define START_B_ANGLE 105.24
-#define START_C_ANGLE 99.60
+#define START_B_ANGLE 104.84
+#define START_C_ANGLE 99.46
 #define OFFSET_ROT 12.5
 
 #define START_X 109.55
@@ -29,5 +29,5 @@
 #define Y_AXIS_SLOPE_MAX 1
 #define Y_AXIS_SLOPE_MIN -1
 
-#define Z_AXIS_TARTGET_POSITION_CALIBRATION_ALGORUTHM target[Z_AXIS] += (X_KTMP * target[X_AXIS] + Y_KTMP * (target[Y_AXIS] - 200));
-#define Z_AXIS_CURRENT_POSITION_CALIBRATION_ALGORUTHM current_position[Z_AXIS] += (X_KTMP * current_position[X_AXIS] + Y_KTMP * current_position[Y_AXIS] - Y_KTMP * 200);
+#define Z_AXIS_TARTGET_POSITION_CALIBRATION_ALGORUTHM target[Z_AXIS] += (X_KTMP * (target[X_AXIS] - 200) + Y_KTMP * target[Y_AXIS]);
+#define Z_AXIS_CURRENT_POSITION_CALIBRATION_ALGORUTHM current_position[Z_AXIS] += (X_KTMP * current_position[X_AXIS] + Y_KTMP * current_position[Y_AXIS] - X_KTMP * 200);

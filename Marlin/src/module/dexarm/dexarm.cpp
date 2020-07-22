@@ -248,7 +248,7 @@ char inverse_kinematics_dexarm(const xyz_pos_t &position, abc_pos_t &angle)
 	float z = position.z;
 
 	//apply_leveling
-	z += (x_axis_scaling_factor * x + y_axis_scaling_factor * (y - 200));
+	z += (x_axis_scaling_factor * (x - 200) + y_axis_scaling_factor * y);
 
 	float tmps = sqrt(x * x + y * y);
 
@@ -259,25 +259,25 @@ char inverse_kinematics_dexarm(const xyz_pos_t &position, abc_pos_t &angle)
 	float angleLeft = 0;
 	float angleRight = 0;
 
-	if (y < 0.01)
+	if (x < 0.01)
 	{
-		y = 0.01;
+		x = 0.01;
 	}
 
 	// Calculate value of theta 1: the rotation angle
-	if (x == 0)
+	if (y == 0)
 	{
 		angleRot = 90;
 	}
 	else
 	{
-		if (x < 0)
+		if (y < 0)
 		{
-			angleRot = -atan(y / x) * MATH_TRANS;
+			angleRot = -atan(x / y) * MATH_TRANS;
 		}
-		if (x > 0)
+		if (y > 0)
 		{
-			angleRot = 180 - atan(y / x) * MATH_TRANS;
+			angleRot = 180 - atan(x / y) * MATH_TRANS;
 		}
 	}
 
@@ -398,6 +398,7 @@ void inverse_kinematics(const xyz_pos_t &raw)
 	if (inverse_kinematics_dexarm(raw, diff_angle) == 0)
 	{
 		diff_angle[A_AXIS] -= start_angle_a;
+		diff_angle[A_AXIS] *= -1;
 		diff_angle[B_AXIS] = start_angle_b - diff_angle[B_AXIS];
 		diff_angle[C_AXIS] -= start_angle_c;
 	}
@@ -424,9 +425,9 @@ bool dexarm_position_is_reachable(const xyz_pos_t &position)
 		return false;
 	}
 
-	if (y < 0)
+	if (x < 0)
 	{
-		MYSERIAL0.println("Y beyond limit.....");
+		MYSERIAL0.println("X beyond limit.....");
 		return false;
 	}
 
