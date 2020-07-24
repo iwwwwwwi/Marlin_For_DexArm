@@ -79,6 +79,12 @@ enum BlockFlagBit : char {
 
   // Sync the stepper counts from the block
   BLOCK_BIT_SYNC_POSITION
+
+
+  // Sync the fan speeds from the block
+  //#if ENABLED(LASER_SYNCHRONOUS_M106_M107)
+    , BLOCK_BIT_SYNC_FANS
+  //#endif
 };
 
 enum BlockFlag : char {
@@ -86,7 +92,12 @@ enum BlockFlag : char {
   BLOCK_FLAG_NOMINAL_LENGTH       = _BV(BLOCK_BIT_NOMINAL_LENGTH),
   BLOCK_FLAG_CONTINUED            = _BV(BLOCK_BIT_CONTINUED),
   BLOCK_FLAG_SYNC_POSITION        = _BV(BLOCK_BIT_SYNC_POSITION)
+  //#if ENABLED(LASER_SYNCHRONOUS_M106_M107)
+    , BLOCK_FLAG_SYNC_FANS          = _BV(BLOCK_BIT_SYNC_FANS)
+  //#endif
 };
+
+#define BLOCK_MASK_SYNC (BLOCK_FLAG_SYNC_POSITION|BLOCK_FLAG_SYNC_FANS)
 
 /**
  * struct block_t
@@ -388,6 +399,16 @@ class Planner {
     // Manage fans, paste pressure, etc.
     static void check_axes_activity();
 
+    // Apply fan speeds
+    #if FAN_COUNT
+      static void sync_fan_speeds(uint8_t (&fan_speed)[FAN_COUNT]);
+      #if FAN_KICKSTART_TIME
+        static void kickstart_fan(uint8_t (&fan_speed)[FAN_COUNT], const millis_t &ms, const uint8_t f);
+      #else
+        FORCE_INLINE static void kickstart_fan(uint8_t (&)[FAN_COUNT], const millis_t &, const uint8_t) {}
+      #endif
+    #endif
+
     // Update multipliers based on new diameter measurements
     static void calculate_volumetric_multipliers();
 
@@ -623,9 +644,12 @@ class Planner {
 
     /**
      * Planner::buffer_sync_block
-     * Add a block to the buffer that just updates the position
+     * Add a block to the buffer that just updates the position or in
+     * case of LASER_SYNCHRONOUS_M106_M107 the fan pwm
      */
-    static void buffer_sync_block();
+    static void buffer_sync_block(
+      TERN_(LASER_SYNCHRONOUS_M106_M107, uint8_t sync_flag=BLOCK_FLAG_SYNC_POSITION)
+    );
 
   #if IS_KINEMATIC
     private:

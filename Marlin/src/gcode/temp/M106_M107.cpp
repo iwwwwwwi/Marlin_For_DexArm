@@ -28,6 +28,10 @@
 #include "../../module/motion.h"
 #include "../../module/temperature.h"
 
+#if ENABLED(LASER_SYNCHRONOUS_M106_M107)
+  #include "../../module/planner.h"
+#endif
+
 #if ENABLED(SINGLENOZZLE)
   #define _ALT_P active_extruder
   #define _CNT_P EXTRUDERS
@@ -63,6 +67,9 @@ void GcodeSuite::M106() {
     NOMORE(s, 255U);
 
     thermalManager.set_fan_speed(p, s);
+    #if ENABLED(LASER_SYNCHRONOUS_M106_M107)
+      planner.buffer_sync_block(BLOCK_FLAG_SYNC_FANS);
+    #endif
   }
 }
 
@@ -72,6 +79,9 @@ void GcodeSuite::M106() {
 void GcodeSuite::M107() {
   const uint8_t p = parser.byteval('P', _ALT_P);
   thermalManager.set_fan_speed(p, 0);
+  #if ENABLED(LASER_SYNCHRONOUS_M106_M107)
+    planner.buffer_sync_block(BLOCK_FLAG_SYNC_FANS);
+  #endif
 }
 
 #endif // FAN_COUNT > 0

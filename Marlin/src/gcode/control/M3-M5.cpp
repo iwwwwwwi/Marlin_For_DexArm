@@ -22,11 +22,12 @@
 
 #include "../../inc/MarlinConfig.h"
 
-#if HAS_CUTTER
+//#if HAS_CUTTER
 
 #include "../gcode.h"
 #include "../../feature/spindle_laser.h"
 #include "../../module/stepper.h"
+#include "../../module/temperature.h"
 
 /**
  * Laser:
@@ -69,6 +70,7 @@
  *
  *  PWM duty cycle goes from 0 (off) to 255 (always on).
  */
+/*
 void GcodeSuite::M3_M4(const bool is_M4) {
 
   #if ENABLED(SPINDLE_FEATURE)
@@ -86,15 +88,41 @@ void GcodeSuite::M3_M4(const bool is_M4) {
     cutter.set_enabled(true);
   #endif
 }
+*/
+void GcodeSuite::M3_M4(const bool is_M4) {
+  const uint8_t p = parser.byteval('P');
+	static uint16_t M3S = 255;
+  if (p < FAN_COUNT) {
+    const uint16_t s = parser.ushortval('S', M3S);
+	  M3S = s;
+    //NOMORE(s, 255U);
+    thermalManager.set_fan_speed(p, s);
+    //fanSpeed[p] = min(s, 255);
+    #if ENABLED(LASER_SYNCHRONOUS_M106_M107)
+      planner.buffer_sync_block(BLOCK_FLAG_SYNC_FANS);
+    #endif
+  }
+}
 
 /**
  * M5 - Cutter OFF
  */
+/*
 void GcodeSuite::M5() {
   #if ENABLED(SPINDLE_FEATURE)
     planner.synchronize();
   #endif
   cutter.set_enabled(false);
 }
-
-#endif // HAS_CUTTER
+*/
+void GcodeSuite::M5() {
+	const uint8_t p = parser.byteval('P');
+    if (p < FAN_COUNT) {
+      //fanSpeed[p] = 0;
+      thermalManager.set_fan_speed(p, 0);
+      #if ENABLED(LASER_SYNCHRONOUS_M106_M107)
+        planner.buffer_sync_block(BLOCK_FLAG_SYNC_FANS);
+      #endif
+    }
+}
+//#endif // HAS_CUTTER

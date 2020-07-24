@@ -504,10 +504,10 @@ private:
     static void M0_M1();
   #endif
 
-  #if HAS_CUTTER
+  //#if HAS_CUTTER
     static void M3_M4(const bool is_M4);
     static void M5();
-  #endif
+  //#endif
 
   #if ENABLED(COOLANT_CONTROL)
     #if ENABLED(COOLANT_MIST)

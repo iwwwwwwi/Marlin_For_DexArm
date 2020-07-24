@@ -1771,8 +1771,15 @@ uint32_t Stepper::block_phase_isr() {
     if ((current_block = planner.get_current_block())) {
 
       // Sync block? Sync the stepper counts and return
-      while (TEST(current_block->flag, BLOCK_BIT_SYNC_POSITION)) {
-        _set_position(current_block->position);
+      while (current_block->flag & BLOCK_MASK_SYNC) {
+
+        #if ENABLED(LASER_SYNCHRONOUS_M106_M107)
+          if (TEST(current_block->flag, BLOCK_BIT_SYNC_FANS))
+            planner.sync_fan_speeds(current_block->fan_speed);
+          else
+        #endif
+         _set_position(current_block->position);
+        
         planner.discard_current_block();
 
         // Try to get a new block
