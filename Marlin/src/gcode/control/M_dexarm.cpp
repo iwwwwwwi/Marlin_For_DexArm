@@ -122,10 +122,10 @@ void GcodeSuite::M891(void)
 	x = parser.floatval('X', 999);
 	y = parser.floatval('Y', 999);
 
-	if (x_axis_scaling_factor < X_AXIS_SLOPE_MAX && x_axis_scaling_factor > X_AXIS_SLOPE_MIN)
+	if (x < X_AXIS_SLOPE_MAX && x > X_AXIS_SLOPE_MIN)
 	{
 		MYSERIAL0.print("SET X AXIS SLOPE IS ");
-		MYSERIAL0.println(x_axis_scaling_factor, 5);
+		MYSERIAL0.println(x, 5);
 	}
 	else
 	{
@@ -133,10 +133,10 @@ void GcodeSuite::M891(void)
 		return;
 	}
 
-	if (y_axis_scaling_factor < Y_AXIS_SLOPE_MAX && y_axis_scaling_factor > Y_AXIS_SLOPE_MIN)
+	if (y < Y_AXIS_SLOPE_MAX && y > Y_AXIS_SLOPE_MIN)
 	{
 		MYSERIAL0.print("SET Y AXIS SLOPE IS ");
-		MYSERIAL0.println(y_axis_scaling_factor, 5);
+		MYSERIAL0.println(y, 5);
 	}
 	else
 	{
