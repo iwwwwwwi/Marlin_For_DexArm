@@ -57,6 +57,23 @@ void GcodeSuite::M888(void)
 			MYSERIAL0.println("THE CURRENT MODULE IS Custom Module");
 			break;
 		}
+		case 10:
+		{
+			laser_protection_enable_flag = false;
+			MYSERIAL0.println("Disable laser protection");
+			break;
+		}
+		case 11:
+		{
+			laser_protection_enable_flag = true;
+			MYSERIAL0.println("Enable laser protection");
+			break;
+		}
+		case 12:
+		{
+			//To-Do
+			break;
+		}
 		}
 		(void)settings.save();
 		destination = current_position;

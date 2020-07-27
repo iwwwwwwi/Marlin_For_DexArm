@@ -24,6 +24,9 @@ float dexarm_offset = front_module_offset + OFFSET_ROT;
 
 float delta_segments_per_second = SCARA_SEGMENTS_PER_SECOND;
 
+bool laser_protection_enable_flag = false;
+bool laser_door_open_flag = false;
+
 bool position_init_flag = false; //DexArm will not move without position init.
 bool current_posution_flag = false;
 

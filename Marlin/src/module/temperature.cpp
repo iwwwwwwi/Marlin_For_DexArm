@@ -103,6 +103,8 @@
   #include "../feature/tool_types.h"
 #endif
 
+#include "./dexarm/dexarm.h"
+
 #if HOTEND_USES_THERMISTOR
   #if ENABLED(TEMP_SENSOR_1_AS_REDUNDANT)
     static const void* heater_ttbl_map[2] = { (void*)HEATER_0_TEMPTABLE, (void*)HEATER_1_TEMPTABLE };
@@ -2437,7 +2439,26 @@ void Temperature::readings_ready() {
             || temp_hotend[e].soft_pwm_amount > 0
           #endif
         );
-        if (rawtemp > temp_range[e].raw_max * tdir) max_temp_error((heater_ind_t)e);
+        if (rawtemp > temp_range[e].raw_max * tdir){
+          if(laser_protection_enable_flag){
+            MYSERIAL0.println("Warning!Door opened");
+            SERIAL_EOL();
+            laser_door_open_flag = true;
+            analogWrite(FAN_PIN, 0);
+            //quickstop_stepper();
+            planner.quick_stop();
+            //planner.synchronize();
+          }else{
+            max_temp_error((heater_ind_t)e);
+          }
+        }else{
+            if(laser_door_open_flag){
+              MYSERIAL0.println("Warning!Door closed");
+              laser_door_open_flag = false;
+              SERIAL_ECHOPGM(STR_OK);
+              SERIAL_EOL();
+            }
+        }
         if (heater_on && rawtemp < temp_range[e].raw_min * tdir && !is_preheating(e)) {
           #ifdef MAX_CONSECUTIVE_LOW_TEMPERATURE_ERROR_ALLOWED
             if (++consecutive_low_temperature_error[e] >= MAX_CONSECUTIVE_LOW_TEMPERATURE_ERROR_ALLOWED)

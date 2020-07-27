@@ -12,6 +12,9 @@ extern float y_axis_scaling_factor;
 extern float front_module_offset;
 extern float delta_segments_per_second;
 
+extern bool laser_protection_enable_flag;
+extern bool laser_door_open_flag;
+
 extern bool position_init_flag;
 
 void print_current_module_type();
