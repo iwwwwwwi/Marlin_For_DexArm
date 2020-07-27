@@ -26,7 +26,7 @@
 #endif
 
 #define BOARD_INFO_NAME "DexArm V3_1" // redefined?
-#define HARDWARE_VERSION "Hardware V3.2\r\n"
+#define HARDWARE_VERSION "Hardware V3.1\r\n"
 #define FIRMWARE_VERSION "Firmware V2.1.4\r\n"
 
 // Use one of these or SDCard-based Emulation will be used
