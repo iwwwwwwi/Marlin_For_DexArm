@@ -897,6 +897,7 @@ void setup() {
       serial_connect_timeout = millis() + 1000UL;
       while (!MYSERIAL1 && PENDING(millis(), serial_connect_timeout)) { /*nada*/ }
     #endif
+    MYSERIAL2.begin(BAUDRATE);
   #endif
 
   SERIAL_ECHOLNPGM("start");
