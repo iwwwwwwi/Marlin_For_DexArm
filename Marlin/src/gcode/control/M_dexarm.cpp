@@ -254,6 +254,14 @@ void GcodeSuite::M1113()
 	}
 }
 
+void GcodeSuite::M1114()
+{
+    forward_kinematics_DEXARM(
+      planner.get_axis_position_degrees(A_AXIS),
+      planner.get_axis_position_degrees(B_AXIS),
+      planner.get_axis_position_degrees(C_AXIS));
+}
+
 void GcodeSuite::M2002()
 {
 	need_confirm_state = NEED_CONFIRM;
