@@ -140,6 +140,40 @@ void process_encoder(int x, int y, int z){
 		angle_diff[axis] = ((float)diff_position_sensor_value[axis]) * 360.0 / 4096.0;
 	}
 	rotate_angle_diff(angle_diff);
+
+	int diff_angle[3] = {0};
+	LOOP_ABC(axis) {
+		diff_angle[axis] = get_position_sensor_diff(calibration_position_sensor_value[axis], target_position_sensor_value[axis])*360/4096;
+	}
+	/*
+	SERIAL_ECHOLNPAIR(
+		"diff_angle a=", diff_angle[A_AXIS],
+		" b=", diff_angle[B_AXIS],
+		" c=", diff_angle[C_AXIS]);
+	//*/
+	abce_pos_t target;
+	target[A_AXIS] = diff_angle[A_AXIS];
+	target[B_AXIS] = diff_angle[B_AXIS];
+	target[C_AXIS] = diff_angle[C_AXIS];
+	target[E_AXIS] = 0;
+	planner.set_machine_position_mm(target);
+	forward_kinematics_DEXARM(target[A_AXIS], target[B_AXIS], target[C_AXIS]);
+
+	xyze_pos_t pos = cartes;
+	pos.e = planner.get_axis_position_mm(E_AXIS);
+	current_position = pos;
+
+	planner.synchronize();
+	abc_float_t deg = {
+		planner.get_axis_position_degrees(A_AXIS),
+		planner.get_axis_position_degrees(B_AXIS),
+		planner.get_axis_position_degrees(C_AXIS)};
+	/*
+	SERIAL_ECHOLNPAIR(
+		"Current Angle a=", deg[A_AXIS],
+		" b=", deg[B_AXIS],
+		" c=", deg[C_AXIS]);
+	//*/
 	planner.synchronize();
 }
 
@@ -168,6 +202,23 @@ int position_M1111()
 			current_position[1] = START_Y;
 			current_position[2] = START_Z;
 			position_init_flag = true;
+
+			abce_pos_t target;
+			target[A_AXIS] = 0;
+			target[B_AXIS] = 0;
+			target[C_AXIS] = 0;
+			target[E_AXIS] = 0;
+			planner.set_machine_position_mm(target);
+
+			planner.synchronize();
+			abc_float_t deg = {
+				planner.get_axis_position_degrees(A_AXIS),
+				planner.get_axis_position_degrees(B_AXIS),
+				planner.get_axis_position_degrees(C_AXIS)};
+			SERIAL_ECHOLNPAIR(
+				"Current Angle a=", deg[A_AXIS],
+				" b=", deg[B_AXIS],
+				" c=", deg[C_AXIS]);
 			return 1;
 		}
 		else
@@ -183,6 +234,21 @@ int position_M1111()
 			planner.synchronize();
 		}
 	}
+}
+
+void forward_kinematics_DEXARM(const float &a, const float &b, const float &c) {
+	float l1, x, y, z;
+	l1 = 150 * cos((START_B_ANGLE - b) / MATH_TRANS) + 150 * sin((START_C_ANGLE + c) / MATH_TRANS) + dexarm_offset;
+	z = 150 * sin((START_B_ANGLE - b) / MATH_TRANS) - 150 * cos((START_C_ANGLE + c) / MATH_TRANS);
+	y = l1 * cos(a / MATH_TRANS);
+	x = l1 * sin(a / MATH_TRANS);
+	//*
+	SERIAL_ECHOLNPAIR(
+		" x=", x,
+		" y=", y,
+		" z=", z, );
+	//*/
+	cartes.set(x, y, z);
 }
 
 char inverse_kinematics_dexarm_xy_legace(const xyz_pos_t &position, abc_pos_t &angle)
@@ -344,6 +410,25 @@ int m1112_position(xyz_pos_t &position)
 			start_angle_c = target_angle[2];
 			LOOP_XYZ(axis) { current_position[axis] = position[axis]; }
 			position_init_flag = true;
+
+			abce_pos_t target;
+			target[A_AXIS] = diff_target_calibration_angle[A_AXIS];
+			target[B_AXIS] = diff_target_calibration_angle[B_AXIS];
+			target[C_AXIS] = diff_target_calibration_angle[C_AXIS];
+			target[E_AXIS] = 0;
+			planner.set_machine_position_mm(target);
+
+			planner.synchronize();
+			abc_float_t deg = {
+				planner.get_axis_position_degrees(A_AXIS),
+				planner.get_axis_position_degrees(B_AXIS),
+				planner.get_axis_position_degrees(C_AXIS)};
+			//*
+			SERIAL_ECHOLNPAIR(
+				"Current Angle a=", deg[A_AXIS],
+				" b=", deg[B_AXIS],
+				" c=", deg[C_AXIS]);
+			//*
 			return 1;
 		}
 		else
@@ -377,6 +462,23 @@ int m1113_position(xyz_pos_t &position)
 	start_angle_c = target_angle[2];
 	LOOP_XYZ(axis) { current_position[axis] = position[axis]; }
 	position_init_flag = true;
+
+	abce_pos_t target;
+	target[A_AXIS] = diff_target_calibration_angle[A_AXIS];
+	target[B_AXIS] = diff_target_calibration_angle[B_AXIS];
+	target[C_AXIS] = diff_target_calibration_angle[C_AXIS];
+	target[E_AXIS] = 0;
+	planner.set_machine_position_mm(target);
+
+	planner.synchronize();
+	abc_float_t deg = {
+		planner.get_axis_position_degrees(A_AXIS),
+		planner.get_axis_position_degrees(B_AXIS),
+		planner.get_axis_position_degrees(C_AXIS)};
+	SERIAL_ECHOLNPAIR(
+		"Current Angle a=", deg[A_AXIS],
+		" b=", deg[B_AXIS],
+		" c=", deg[C_AXIS]);
 	return 1;
 }
 
@@ -397,9 +499,18 @@ void inverse_kinematics(const xyz_pos_t &raw)
 
 	if (inverse_kinematics_dexarm(raw, diff_angle) == 0)
 	{
-		diff_angle[A_AXIS] -= start_angle_a;
-		diff_angle[B_AXIS] = start_angle_b - diff_angle[B_AXIS];
-		diff_angle[C_AXIS] -= start_angle_c;
+		/*
+		SERIAL_ECHOLNPAIR(
+			"Inverse Angle a=", diff_angle[A_AXIS],
+			" b=", diff_angle[B_AXIS],
+			" c=", diff_angle[C_AXIS]);
+		//*/
+		//diff_angle[A_AXIS] -= start_angle_a;
+		//diff_angle[B_AXIS] = start_angle_b - diff_angle[B_AXIS];
+		//diff_angle[C_AXIS] -= start_angle_c;
+		diff_angle[A_AXIS] -= START_A_ANGLE;
+		diff_angle[B_AXIS] = START_B_ANGLE - diff_angle[B_AXIS];
+		diff_angle[C_AXIS] -= START_C_ANGLE;
 	}
 	delta.set(diff_angle[0], diff_angle[1], diff_angle[2]);
 }
@@ -436,4 +547,9 @@ bool dexarm_position_is_reachable(const xyz_pos_t &position)
 		return false;
 	}
 	return true;
+}
+
+void dexarm_report_positions() {
+  SERIAL_ECHOLNPAIR("DEXARM Theta A:", planner.get_axis_position_degrees(A_AXIS), "  Theta B:", planner.get_axis_position_degrees(B_AXIS), "  Theta C:", planner.get_axis_position_degrees(C_AXIS));
+  SERIAL_EOL();
 }

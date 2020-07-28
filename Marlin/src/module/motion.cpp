@@ -74,7 +74,7 @@
 #define DEBUG_OUT ENABLED(DEBUG_LEVELING_FEATURE)
 #include "../core/debug_out.h"
 
- #include "./dexarm/dexarm.h"
+#include "./dexarm/dexarm.h"
 #define XYZ_CONSTS(T, NAME, OPT) const PROGMEM XYZval<T> NAME##_P = { X_##OPT, Y_##OPT, Z_##OPT }
 
 XYZ_CONSTS(float, base_min_pos,   MIN_POS);
@@ -217,6 +217,9 @@ inline void report_more_positions() {
   #if IS_SCARA
     scara_report_positions();
   #endif
+  #if IS_DEXARM
+    dexarm_report_positions();
+  #endif
 }
 
 // Report the logical position for a given machine position
@@ -287,6 +290,11 @@ void sync_plan_position_e() { planner.set_e_position_mm(current_position.e); }
 void get_cartesian_from_steppers() {
   #if ENABLED(DELTA)
     forward_kinematics_DELTA(planner.get_axis_positions_mm());
+  #elif ENABLED(DEXARM)
+    forward_kinematics_DEXARM(
+      planner.get_axis_position_degrees(A_AXIS),
+      planner.get_axis_position_degrees(B_AXIS),
+      planner.get_axis_position_degrees(B_AXIS));
   #else
     #if IS_SCARA
       forward_kinematics_SCARA(

@@ -2454,7 +2454,7 @@ void Stepper::report_a_position(const xyz_long_t &pos) {
   #else
     SERIAL_ECHOPAIR_P(PSTR(STR_COUNT_X), pos.x, SP_Y_LBL, pos.y);
   #endif
-  #if CORE_IS_XZ || CORE_IS_YZ || ENABLED(DELTA)
+  #if CORE_IS_XZ || CORE_IS_YZ || ENABLED(DELTA) || IS_DEXARM
     SERIAL_ECHOLNPAIR(" C:", pos.z);
   #else
     SERIAL_ECHOLNPAIR_P(SP_Z_LBL, pos.z);
