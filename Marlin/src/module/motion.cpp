@@ -74,7 +74,7 @@
 #define DEBUG_OUT ENABLED(DEBUG_LEVELING_FEATURE)
 #include "../core/debug_out.h"
 
- #include "./dexarm/dexarm.h"
+#include "./dexarm/dexarm.h"
 #define XYZ_CONSTS(T, NAME, OPT) const PROGMEM XYZval<T> NAME##_P = { X_##OPT, Y_##OPT, Z_##OPT }
 
 XYZ_CONSTS(float, base_min_pos,   MIN_POS);
@@ -150,7 +150,7 @@ xyze_pos_t destination; // {0}
 // no other feedrate is specified. Overridden for special moves.
 // Set by the last G0 through G5 command's "F" parameter.
 // Functions that override this for custom moves *must always* restore it!
-feedRate_t feedrate_mm_s = MMM_TO_MMS(1500);
+feedRate_t feedrate_mm_s = MMM_TO_MMS(3000);
 int16_t feedrate_percentage = 100;
 
 // Homing feedrate is const progmem - compare to constexpr in the header
@@ -216,6 +216,9 @@ inline void report_more_positions() {
   stepper.report_positions();
   #if IS_SCARA
     scara_report_positions();
+  #endif
+  #if IS_DEXARM
+    dexarm_report_positions();
   #endif
 }
 
@@ -287,6 +290,11 @@ void sync_plan_position_e() { planner.set_e_position_mm(current_position.e); }
 void get_cartesian_from_steppers() {
   #if ENABLED(DELTA)
     forward_kinematics_DELTA(planner.get_axis_positions_mm());
+  #elif ENABLED(DEXARM)
+    forward_kinematics_DEXARM(
+      planner.get_axis_position_degrees(A_AXIS),
+      planner.get_axis_position_degrees(B_AXIS),
+      planner.get_axis_position_degrees(B_AXIS));
   #else
     #if IS_SCARA
       forward_kinematics_SCARA(

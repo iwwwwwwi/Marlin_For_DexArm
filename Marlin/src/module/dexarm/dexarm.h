@@ -28,8 +28,11 @@ int position_M1111();
 int m1112_position(xyz_pos_t &position);
 int m1113_position(xyz_pos_t &position);
 
+void forward_kinematics_DEXARM(const float &a, const float &b, const float &c);
 void rotate_angle_diff(abc_pos_t &angle_abc);
 void inverse_kinematics(const xyz_pos_t &raw);
 
 bool dexarm_position_is_reachable(const xyz_pos_t &position);
+
+void dexarm_report_positions();
 

@@ -765,7 +765,7 @@ class Planner {
     }
 
     // SCARA AB axes are in degrees, not mm
-    #if IS_SCARA
+    #if IS_SCARA | IS_DEXARM
       FORCE_INLINE static float get_axis_position_degrees(const AxisEnum axis) { return get_axis_position_mm(axis); }
     #endif
 
