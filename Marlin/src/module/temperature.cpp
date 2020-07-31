@@ -2440,23 +2440,36 @@ void Temperature::readings_ready() {
           #endif
         );
         if (rawtemp > temp_range[e].raw_max * tdir){
-          if(laser_protection_enable_flag){
-            MYSERIAL0.println("Warning!Door opened");
-            SERIAL_EOL();
-            laser_door_open_flag = true;
-            analogWrite(FAN_PIN, 0);
-            //quickstop_stepper();
-            planner.quick_stop();
-            //planner.synchronize();
+          if (laser_protection_enable_flag)
+          {
+            if (door_open_message_counter == 0)
+            {
+              //SERIAL_ECHOPAIR("Warning!Door opened");
+              MYSERIAL0.println("Warning!Laser protection door opened");
+              MYSERIAL1.println("Warning!Laser protection door opened");
+              //SERIAL_EOL();
+            }
+            if (!laser_door_open_flag){
+              laser_door_open_flag = true;
+              analogWrite(FAN_PIN, 0);
+              planner.quick_stop();
+            }
+            door_open_message_counter++;
+            if(door_open_message_counter > 200){
+              door_open_message_counter = 0;
+            }
           }else{
             max_temp_error((heater_ind_t)e);
           }
         }else{
             if(laser_door_open_flag){
-              MYSERIAL0.println("Warning!Door closed");
+              door_open_message_counter = 0;
+              MYSERIAL0.println("Laser protection door closed");
+              MYSERIAL1.println("Laser protection door closed");
+              planner.synchronize();
+              set_current_from_steppers_for_axis(ALL_AXES);
+              sync_plan_position();
               laser_door_open_flag = false;
-              SERIAL_ECHOPGM(STR_OK);
-              SERIAL_EOL();
             }
         }
         if (heater_on && rawtemp < temp_range[e].raw_min * tdir && !is_preheating(e)) {

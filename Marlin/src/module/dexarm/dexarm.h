@@ -7,6 +7,7 @@
 
 //Dexarm config
 extern int calibration_position_sensor_value[3];
+extern int door_open_message_counter;
 extern float x_axis_scaling_factor;
 extern float y_axis_scaling_factor;
 extern float front_module_offset;

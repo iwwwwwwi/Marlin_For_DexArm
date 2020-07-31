@@ -12,6 +12,7 @@
 #include "../planner.h"
 
 int calibration_position_sensor_value[3]; //Set by M889
+int door_open_message_counter;
 float x_axis_scaling_factor;			  //leveling
 float y_axis_scaling_factor;			  //leveling
 float front_module_offset = PEN_MODULE_OFFSET;
@@ -75,6 +76,11 @@ void module_position_init()
 	MYSERIAL0.print("dexarm_offset IS ");
 	MYSERIAL0.println(dexarm_offset);
 	print_current_module_type();
+	if (fabs(front_module_offset - LASER_MODULE_OFFSET) < 0.1)
+	{
+		laser_protection_enable_flag = true;
+		//MYSERIAL0.println("The current module is LASER");
+	}
 }
 
 /**
