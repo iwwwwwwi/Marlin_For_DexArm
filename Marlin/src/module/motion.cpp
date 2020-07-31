@@ -294,7 +294,7 @@ void get_cartesian_from_steppers() {
     forward_kinematics_DEXARM(
       planner.get_axis_position_degrees(A_AXIS),
       planner.get_axis_position_degrees(B_AXIS),
-      planner.get_axis_position_degrees(B_AXIS));
+      planner.get_axis_position_degrees(C_AXIS));
   #else
     #if IS_SCARA
       forward_kinematics_SCARA(
