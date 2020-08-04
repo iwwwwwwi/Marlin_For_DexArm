@@ -38,28 +38,29 @@ void GcodeSuite::M888(void)
 			MYSERIAL0.println("THE CURRENT MODULE IS PEN");
 			(void)settings.save();
 			update_dexarm_offset();
-			planner.buffer_line(destination, 30, active_extruder);
+			planner.buffer_line(current_position, 30, active_extruder);
 			break;
 		case 1:
 			front_module_offset = LASER_MODULE_OFFSET;
+			laser_protection_enable_flag = true;
 			MYSERIAL0.println("THE CURRENT MODULE IS LASER");
 			(void)settings.save();
 			update_dexarm_offset();
-			planner.buffer_line(destination, 30, active_extruder);
+			planner.buffer_line(current_position, 30, active_extruder);
 			break;
 		case 2:
 			front_module_offset = PUMP_MODULE_OFFSET;
 			MYSERIAL0.println("THE CURRENT MODULE IS PUMP");
 			(void)settings.save();
 			update_dexarm_offset();
-			planner.buffer_line(destination, 30, active_extruder);
+			planner.buffer_line(current_position, 30, active_extruder);
 			break;
 		case 3:
 			front_module_offset = _3D_MODULE_OFFSET;
 			MYSERIAL0.println("THE CURRENT MODULE IS 3D");
 			(void)settings.save();
 			update_dexarm_offset();
-			planner.buffer_line(destination, 30, active_extruder);
+			planner.buffer_line(current_position, 30, active_extruder);
 			break;
 		//case 4:  front_module_offset = CAMERA_MODULE_OFFSET;    MYSERIAL0.println("THE CURRENT MODULE IS Camera");    break;
 		case 5:
@@ -92,7 +93,7 @@ void GcodeSuite::M888(void)
 				SERIAL_ECHOPAIR("Warning!Laser protection door opened");
 				SERIAL_EOL();
 			}else{
-				SERIAL_ECHOPAIR("Warning!Laser protection door closed");
+				SERIAL_ECHOPAIR("Laser protection door closed");
 				SERIAL_EOL();
 			}
 			break;
