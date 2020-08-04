@@ -2,7 +2,8 @@
 #include "../../core/debug_out.h"
 
 #include "stm32f4xx_hal.h"
-#include "dexarm_update_manager.h"
+#include "../configuration_store.h"
+#include "dexarm.h"
 
 #define ADDR_FLASH_SECTOR_0     ((uint32_t)0x08000000) /* Base @ of Sector 0, 16 Kbytes */
 #define ADDR_FLASH_SECTOR_1     ((uint32_t)0x08004000) /* Base @ of Sector 1, 16 Kbytes */
@@ -128,6 +129,24 @@ void enter_update(void)
   NVIC_SystemReset();  
 }
 
+void reset_calibration_position_sensor_value(){
+    calibration_position_sensor_value[0] = *(volatile uint32_t *)AS5600_ADDRESS1;
+    calibration_position_sensor_value[1] = *(volatile uint32_t *)AS5600_ADDRESS2;
+    calibration_position_sensor_value[2] = *(volatile uint32_t *)AS5600_ADDRESS3;
+
+    (void)settings.save();
+}
+
+void check_eeprom_version()
+{
+    volatile uint32_t eeprom_version = 0;
+    eeprom_version = *(volatile uint32_t *)EEPROM_VSERION;
+    //eeprom version V74
+    if(eeprom_version == 3422038){
+      reset_calibration_position_sensor_value();
+    }
+}
+
 int get_need_update_flag()
 {
     volatile int need_update_flag = 0;
@@ -206,6 +225,7 @@ void clear_need_verification(void){
 
 void check_update_flag(void)
 {
+  check_eeprom_version();
   device_id = get_device_id();
   if (get_need_update_flag() == NEED)
   {
