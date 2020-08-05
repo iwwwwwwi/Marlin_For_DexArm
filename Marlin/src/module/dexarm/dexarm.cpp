@@ -32,6 +32,9 @@ bool position_init_flag = false; //DexArm will not move without position init.
 bool current_posution_flag = false;
 
 float current_position_init[XYZE] = {START_X + dexarm_offset, START_Y, START_Z, 0.0};
+
+move_mode_t G0_MOVE_MODE = FAST_MODE;
+
 #define CURRENT_POSITION_INIT                                            \
 	if (current_posution_flag)                                           \
 	{                                                                    \
@@ -226,10 +229,12 @@ int position_M1111()
 				planner.get_axis_position_degrees(A_AXIS),
 				planner.get_axis_position_degrees(B_AXIS),
 				planner.get_axis_position_degrees(C_AXIS)};
+			/*
 			SERIAL_ECHOLNPAIR(
 				"Current Angle a=", deg[A_AXIS],
 				" b=", deg[B_AXIS],
 				" c=", deg[C_AXIS]);
+			//*/
 			return 1;
 		}
 		else
@@ -253,7 +258,7 @@ void forward_kinematics_DEXARM(const float &a, const float &b, const float &c) {
 	z = 150 * sin((START_B_ANGLE - b) / MATH_TRANS) - 150 * cos((START_C_ANGLE + c) / MATH_TRANS);
 	y = l1 * cos(a / MATH_TRANS);
 	x = l1 * sin(a / MATH_TRANS);
-	//*
+	/*
 	SERIAL_ECHOLNPAIR(
 		" x=", x,
 		" y=", y,
@@ -435,12 +440,12 @@ int m1112_position(xyz_pos_t &position)
 				planner.get_axis_position_degrees(A_AXIS),
 				planner.get_axis_position_degrees(B_AXIS),
 				planner.get_axis_position_degrees(C_AXIS)};
-			//*
+			/*
 			SERIAL_ECHOLNPAIR(
 				"Current Angle a=", deg[A_AXIS],
 				" b=", deg[B_AXIS],
 				" c=", deg[C_AXIS]);
-			//*
+			//*/
 			return 1;
 		}
 		else
@@ -487,10 +492,12 @@ int m1113_position(xyz_pos_t &position)
 		planner.get_axis_position_degrees(A_AXIS),
 		planner.get_axis_position_degrees(B_AXIS),
 		planner.get_axis_position_degrees(C_AXIS)};
+	/*	
 	SERIAL_ECHOLNPAIR(
 		"Current Angle a=", deg[A_AXIS],
 		" b=", deg[B_AXIS],
 		" c=", deg[C_AXIS]);
+	//*/
 	return 1;
 }
 
@@ -509,6 +516,12 @@ void inverse_kinematics(const xyz_pos_t &raw)
 	//}
 	CURRENT_POSITION_INIT;
 
+	/*
+	SERIAL_ECHOLNPAIR(
+		"target x=", raw[X_AXIS],
+		" y=", raw[Y_AXIS],
+		" z=", raw[Z_AXIS]);
+	//*/
 	if (inverse_kinematics_dexarm(raw, diff_angle) == 0)
 	{
 		/*

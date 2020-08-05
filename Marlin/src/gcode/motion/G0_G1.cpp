@@ -35,6 +35,8 @@
   #include "../../module/stepper.h"
 #endif
 
+#include "../../module/dexarm/dexarm.h"
+
 extern xyze_pos_t destination;
 
 #if ENABLED(VARIABLE_G0_FEEDRATE)
@@ -99,11 +101,16 @@ void GcodeSuite::G0_G1(
 
     #endif // FWRETRACT
 
-    #if IS_SCARA || IS_DEXARM
-      fast_move ? prepare_fast_move_to_destination() : prepare_line_to_destination();
-    #else
+    if (G0_MOVE_MODE == FAST_MODE)
+    {
+      #if IS_SCARA || IS_DEXARM
+        fast_move ? prepare_fast_move_to_destination() : prepare_line_to_destination();
+      #else
+        prepare_line_to_destination();
+      #endif
+    }else if (G0_MOVE_MODE == LINE_MODE){
       prepare_line_to_destination();
-    #endif
+    }
 
     #ifdef G0_FEEDRATE
       // Restore the motion mode feedrate

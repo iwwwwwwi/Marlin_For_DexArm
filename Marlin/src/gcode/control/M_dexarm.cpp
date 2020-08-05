@@ -244,13 +244,13 @@ void GcodeSuite::M1003()
 void GcodeSuite::M1111()
 {
 	planner.synchronize();
-	DEBUG_ECHOLNPGM("M1111");
+	SERIAL_ECHOPAIR("M1111\r\n");
 	position_M1111();
 }
 
 void GcodeSuite::M1112()
 {
-	DEBUG_ECHOLNPGM("M1112");
+	SERIAL_ECHOPAIR("M1112\r\n");
 	planner.synchronize();
 	xyz_pos_t position;
 	bool check_param = parser.seen('X') & parser.seen('Y') & parser.seen('Z');
@@ -272,7 +272,7 @@ void GcodeSuite::M1112()
 
 void GcodeSuite::M1113()
 {
-	DEBUG_ECHOLNPGM("M1113");
+	SERIAL_ECHOPAIR("M1113\r\n");
 	planner.synchronize();
 	xyz_pos_t position;
 	bool check_param = parser.seen('X') & parser.seen('Y') & parser.seen('Z');
@@ -300,10 +300,22 @@ void GcodeSuite::M1114()
       planner.get_axis_position_degrees(C_AXIS));
 }
 
+void GcodeSuite::M2000()
+{
+    SERIAL_ECHOPAIR("M2000\r\n");
+    G0_MOVE_MODE = LINE_MODE;
+}
+
+void GcodeSuite::M2001()
+{
+    SERIAL_ECHOPAIR("M2001\r\n");
+    G0_MOVE_MODE = FAST_MODE;
+}
+
 void GcodeSuite::M2002()
 {
 	need_confirm_state = NEED_CONFIRM;
-	DEBUG_ECHOLNPGM("Ready to enter update bootloader, please use M2003 confirm or M2004 cancel");
+	SERIAL_ECHOPAIR("Ready to enter update bootloader, please use M2003 confirm or M2004 cancel\r\n");
 }
 
 void GcodeSuite::M2003()
@@ -311,12 +323,12 @@ void GcodeSuite::M2003()
 	if (need_confirm_state == NEED_CONFIRM)
 	{
 		need_confirm_state = CONFIRMED;
-		DEBUG_ECHOLNPGM("Reset to enter update bootloader");
+		 SERIAL_ECHOPAIR("Reset to enter update bootloader\r\n");
 		enter_update();
 	}
 	else
 	{
-		DEBUG_ECHOLNPGM("Inorder to confirm <enter update bootloader>, should be used after CMD M2002");
+		SERIAL_ECHOPAIR("Inorder to confirm <enter update bootloader>, should be used after CMD M2002\r\n");
 	}
 }
 
@@ -324,11 +336,12 @@ void GcodeSuite::M2004()
 {
 	if (need_confirm_state == NEED_CONFIRM)
 	{
-		DEBUG_ECHOLNPGM("Cancelled");
+		need_confirm_state = NO_NEED_CONFIRM;
+		SERIAL_ECHOPAIR("Cancelled\r\n");
 	}
 	else
 	{
-		DEBUG_ECHOLNPGM("M2004 is <Cancel enter update> CMD, should be used after CMD M2002");
+		SERIAL_ECHOPAIR("M2004 is <Cancel enter update> CMD, should be used after CMD M2002\r\n");
 	}
 }
 

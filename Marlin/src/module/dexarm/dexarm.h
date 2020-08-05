@@ -18,6 +18,13 @@ extern bool laser_door_open_flag;
 
 extern bool position_init_flag;
 
+typedef enum {
+    FAST_MODE,
+    LINE_MODE,
+}move_mode_t;
+
+extern move_mode_t G0_MOVE_MODE;
+
 void print_current_module_type();
 void module_position_init();
 void update_dexarm_offset(void);
