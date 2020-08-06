@@ -1590,6 +1590,11 @@ void Planner::finish_and_disable() {
   disable_all_steppers();
 }
 
+bool Planner::check_cleaning_buffer_counter() {
+  if (cleaning_buffer_counter) return false;
+  return true;
+}
+
 /**
  * Get an axis position according to stepper position(s)
  * For CORE machines apply translation from ABC to XYZ.

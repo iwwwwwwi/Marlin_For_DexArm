@@ -2464,12 +2464,14 @@ void Temperature::readings_ready() {
         }else{
             if(laser_door_open_flag){
               door_open_message_counter = 0;
-              MYSERIAL0.println("Laser protection door closed");
-              MYSERIAL1.println("Laser protection door closed");
-              planner.synchronize();
-              set_current_from_steppers_for_axis(ALL_AXES);
-              sync_plan_position();
-              laser_door_open_flag = false;
+              if(planner.check_cleaning_buffer_counter()){
+                MYSERIAL0.println("Laser protection door closed");
+                MYSERIAL1.println("Laser protection door closed");
+                planner.synchronize();
+                set_current_from_steppers_for_axis(ALL_AXES);
+                sync_plan_position();
+                laser_door_open_flag = false;
+              }
             }
         }
         if (heater_on && rawtemp < temp_range[e].raw_min * tdir && !is_preheating(e)) {

@@ -785,6 +785,8 @@ class Planner {
     // Wait for moves to finish and disable all steppers
     static void finish_and_disable();
 
+    static bool check_cleaning_buffer_counter();
+
     // Periodic tick to handle cleaning timeouts
     // Called from the Temperature ISR at ~1kHz
     static void tick() {
