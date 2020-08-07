@@ -167,7 +167,7 @@ void process_encoder(int x, int y, int z){
 	target[A_AXIS] = diff_angle[A_AXIS];
 	target[B_AXIS] = diff_angle[B_AXIS];
 	target[C_AXIS] = diff_angle[C_AXIS];
-	target[E_AXIS] = 0;
+	target[E_AXIS] = current_position.e;
 	planner.set_machine_position_mm(target);
 	forward_kinematics_DEXARM(target[A_AXIS], target[B_AXIS], target[C_AXIS]);
 
@@ -219,7 +219,7 @@ int position_M1111()
 			target[A_AXIS] = 0;
 			target[B_AXIS] = 0;
 			target[C_AXIS] = 0;
-			target[E_AXIS] = 0;
+			target[E_AXIS] = current_position.e;
 			LOOP_XYZE(i) { current_position[i] = current_position_init[i];}
 			sync_plan_position();
 			planner.set_machine_position_mm(target);
@@ -431,7 +431,7 @@ int m1112_position(xyz_pos_t &position)
 			target[A_AXIS] = diff_target_calibration_angle[A_AXIS];
 			target[B_AXIS] = diff_target_calibration_angle[B_AXIS];
 			target[C_AXIS] = diff_target_calibration_angle[C_AXIS];
-			target[E_AXIS] = 0;
+			target[E_AXIS] = current_position.e;
 			sync_plan_position();
 			planner.set_machine_position_mm(target);
 
@@ -484,7 +484,7 @@ int m1113_position(xyz_pos_t &position)
 	target[A_AXIS] = diff_target_calibration_angle[A_AXIS];
 	target[B_AXIS] = diff_target_calibration_angle[B_AXIS];
 	target[C_AXIS] = diff_target_calibration_angle[C_AXIS];
-	target[E_AXIS] = 0;
+	target[E_AXIS] = current_position.e;
 	planner.set_machine_position_mm(target);
 
 	planner.synchronize();
