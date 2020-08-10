@@ -15,6 +15,7 @@ extern float delta_segments_per_second;
 
 extern bool laser_protection_enable_flag;
 extern bool laser_door_open_flag;
+extern bool laser_fan_flag;
 
 extern bool position_init_flag;
 

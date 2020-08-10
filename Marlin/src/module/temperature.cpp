@@ -2623,7 +2623,11 @@ void Temperature::tick() {
 
       #if HOTENDS
         #define _PWM_MOD_E(N) _PWM_MOD(N,soft_pwm_hotend[N],temp_hotend[N]);
-        REPEAT(HOTENDS, _PWM_MOD_E);
+        if(laser_fan_flag){
+          OUT_WRITE(HEATER_0_PIN, HIGH);
+        }else{
+          REPEAT(HOTENDS, _PWM_MOD_E);
+        }
       #endif
 
       #if HAS_HEATED_BED
@@ -2670,7 +2674,11 @@ void Temperature::tick() {
       #define _PWM_LOW(N,S) do{ if (S.count <= pwm_count_tmp) WRITE_HEATER_##N(LOW); }while(0)
       #if HOTENDS
         #define _PWM_LOW_E(N) _PWM_LOW(N, soft_pwm_hotend[N]);
-        REPEAT(HOTENDS, _PWM_LOW_E);
+        if(laser_fan_flag){
+          OUT_WRITE(HEATER_0_PIN, HIGH);
+        }else{
+          REPEAT(HOTENDS, _PWM_LOW_E);
+        }
       #endif
 
       #if HAS_HEATED_BED

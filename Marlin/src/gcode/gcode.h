@@ -652,6 +652,7 @@ private:
   static void M2007();
   static void M2010();
   static void M2011();
+  static void M5010000();
 
   #if ENABLED(PARK_HEAD_ON_PAUSE)
     static void M125();

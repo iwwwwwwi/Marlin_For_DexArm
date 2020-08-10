@@ -27,18 +27,19 @@ float delta_segments_per_second = SCARA_SEGMENTS_PER_SECOND;
 
 bool laser_protection_enable_flag = false;
 bool laser_door_open_flag = false;
+bool laser_fan_flag = false;
 
 bool position_init_flag = false; //DexArm will not move without position init.
-bool current_posution_flag = false;
+bool current_position_flag = false;
 
 float current_position_init[XYZE] = {START_X + dexarm_offset, START_Y, START_Z, 0.0};
 
 move_mode_t G0_MOVE_MODE = FAST_MODE;
 
 #define CURRENT_POSITION_INIT                                            \
-	if (current_posution_flag)                                           \
+	if (current_position_flag)                                           \
 	{                                                                    \
-		current_posution_flag = false;                                   \
+		current_position_flag = false;                                   \
 		LOOP_XYZE(i) { current_position[i] = current_position_init[i]; } \
 	}
 

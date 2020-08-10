@@ -27,7 +27,7 @@
 
 #define BOARD_INFO_NAME "DexArm V3_1" // redefined?
 #define HARDWARE_VERSION "Hardware V3.1\r\n"
-#define FIRMWARE_VERSION "Firmware V2.1.5 Beta\r\n"
+#define FIRMWARE_VERSION "Firmware V2.1.6\r\n"
 
 // Use one of these or SDCard-based Emulation will be used
 //#define SRAM_EEPROM_EMULATION   // Use BackSRAM-based EEPROM emulation
@@ -36,6 +36,8 @@
 #define LED_PIN            PB14
 #define UART1_TX_PIN       PA9
 #define UART1_RX_PIN       PA10
+#define UART3_TX_PIN       PD8
+#define UART3_RX_PIN       PD9
 #define LASER_PWM_PIN      PD14
 #define MS1_PIN            PB9
 #define MS2_PIN            PB8
