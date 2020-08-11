@@ -378,6 +378,37 @@ void GcodeSuite::M2011()
 	SERIAL_ECHOPAIR(HARDWARE_VERSION);
 }
 
+//front rotation init
+void GcodeSuite::M2100()
+{
+	int init_speed = 20;
+	int init_position = 10;
+	front_rotation_init();
+	set_motion_speed(SERO_1, init_speed);
+	set_pos(SERO_1, init_position);
+	pos_demo_test();
+}
+
+//front rotation speed&position
+void GcodeSuite::M2101()
+{
+	int speed = 0, positon = 0;
+	bool s_seen = parser.seen('S');
+	if(s_seen){
+		speed = parser.intval('S');
+	}
+
+	bool p_seen = parser.seen('P');
+	if(p_seen){
+		positon = parser.intval('P');
+
+	}
+
+	set_motion_speed(SERO_1, speed);
+	HAL_Delay(100);
+	set_pos(SERO_1, positon);
+}
+
 void GcodeSuite::M5010000()
 {
 	SERIAL_ECHOPAIR("Reset UART3 GPIO Level, please connect touch screen to DexARM\r\n");

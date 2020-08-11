@@ -553,6 +553,8 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
       case 2007: M2007(); break;                                    // M2007
       case 2010: M2010(); break;                                    // M2010
       case 2011: M2011(); break;                                    // M2011
+      case 2100: M2100(); break;                                    // M2100
+      case 2101: M2101(); break;                                    // M2101      
       case 5010000: M5010000(); break;                              // M5010000
 
       #if HOTENDS && HAS_LCD_MENU
