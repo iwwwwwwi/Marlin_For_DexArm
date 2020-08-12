@@ -11,7 +11,7 @@
 
 
 extern uint8_t usart_rev_ch;
-
+extern uint8_t front_rotation_init_flag;
 #define BUF_LEN 50
 extern uint8_t usart_rev_buf[BUF_LEN];
 
@@ -204,7 +204,20 @@ data_typedef w_data_buf(uint8_t id,uint8_t cmd,uint8_t addr,uint16_t info)
 
 }
 
-
+void usart_get_flag_wait()
+{
+	int outtime = 1000*20;
+	while (__HAL_UART_GET_FLAG(&huart1, UART_FLAG_RXNE) == RESET)
+	{
+		 outtime--;
+		 if(outtime<0)
+		 {
+		 	MYSERIAL0.println("receive time out......\r\n");
+			front_rotation_init_flag = 0;
+		 	return ;
+		 }
+	}
+}
 
 bool write_info(int id,uint8_t reg,int val)
 {
@@ -220,13 +233,17 @@ bool write_info(int id,uint8_t reg,int val)
 		HAL_HalfDuplex_EnableTransmitter(&huart1);
 		//HAL_UART_Transmit(&huart1, temp.buf, temp.len+3, 1000);
 		HAL_UART_Transmit(&huart1, temp.buf, 10, 1000);
+
 		while( __HAL_UART_GET_FLAG(&huart1,UART_FLAG_TC)==RESET);	//等待发送结束
+//		usart_get_flag_wait();
+
 		uint8_t rev_len = 0;
 
 		//先接收4 个字节
 		//两个协议头 一个ID 一个长度
 		HAL_HalfDuplex_EnableReceiver(&huart1);
-		while (__HAL_UART_GET_FLAG(&huart1, UART_FLAG_RXNE) == RESET);
+//		while (__HAL_UART_GET_FLAG(&huart1, UART_FLAG_RXNE) == RESET);
+		usart_get_flag_wait();
 		HAL_UART_Receive(&huart1, rev_buf, 4, 1000);
 
 		if(rev_buf[0]==0xFF&&rev_buf[1]==0xFF)
@@ -235,12 +252,10 @@ bool write_info(int id,uint8_t reg,int val)
 		}
 
 		HAL_HalfDuplex_EnableReceiver(&huart1);
-		while (__HAL_UART_GET_FLAG(&huart1, UART_FLAG_RXNE) == RESET){
-			OUT_WRITE(LED_PIN, HIGH);
-		}
-		OUT_WRITE(LED_PIN, LOW);
+//		while (__HAL_UART_GET_FLAG(&huart1, UART_FLAG_RXNE) == RESET);
+		usart_get_flag_wait();
 		HAL_UART_Receive(&huart1, rev_buf+4, rev_len, 1000);
-		//HAL_Delay(1000);
+
 	}while (rev_buf[4]);//发送失败,重发
 	return true;
 
@@ -294,6 +309,7 @@ uint8_t ret_reg_count(uint8_t reg)
 }
 
 
+
 uint16_t read_info(uint8_t id,uint8_t reg)
 {
 	uint8_t rev_buf[DATA_BUF_LEN]={0};
@@ -304,12 +320,14 @@ uint16_t read_info(uint8_t id,uint8_t reg)
 	HAL_UART_Transmit(&huart1, temp.buf, temp.len+4, 1000);
 
 	while( __HAL_UART_GET_FLAG(&huart1,UART_FLAG_TC)==RESET);	//等待发送结束
+
 	uint8_t rev_len = 0;
 
 	//先接收4 个字节
 	//两个协议头 一个ID 一个长度
 	HAL_HalfDuplex_EnableReceiver(&huart1);
-	while (__HAL_UART_GET_FLAG(&huart1, UART_FLAG_RXNE) == RESET);
+//	while (__HAL_UART_GET_FLAG(&huart1, UART_FLAG_RXNE) == RESET);
+	usart_get_flag_wait();
 	HAL_UART_Receive(&huart1, rev_buf, 4, 1000);
 
 	if(rev_buf[0]==0xFF&&rev_buf[1]==0xFF)
@@ -322,7 +340,8 @@ uint16_t read_info(uint8_t id,uint8_t reg)
 	//根据长度接收剩下的字符
 
 	HAL_HalfDuplex_EnableReceiver(&huart1);
-	while (__HAL_UART_GET_FLAG(&huart1, UART_FLAG_RXNE) == RESET);
+//	while (__HAL_UART_GET_FLAG(&huart1, UART_FLAG_RXNE) == RESET);
+	usart_get_flag_wait();
 	HAL_UART_Receive(&huart1, rev_buf+4, rev_len, 1000);
 
 	//结果
@@ -336,28 +355,13 @@ uint16_t read_info(uint8_t id,uint8_t reg)
 	return info_val;
 }
 
-void rev_answer()
+int scope_limit(int min,int val,int max)
 {
-	uint8_t rev_len = 0;
-	uint8_t rev_buf[DATA_BUF_LEN]={0};
-	//先接收4个字节
-	//两个协议头 一个ID 一个长度
-	HAL_HalfDuplex_EnableReceiver(&huart1);
-	while (__HAL_UART_GET_FLAG(&huart1, UART_FLAG_RXNE) == RESET);
-	HAL_UART_Receive(&huart1, rev_buf, 4, 1000);
-
-	if(rev_buf[0]==0xFF&&rev_buf[1]==0xFF)
-	{
-		rev_len = rev_buf[3];//获取长度
-	}
-
-	//根据长度接收剩下的字符
-
-	HAL_HalfDuplex_EnableReceiver(&huart1);
-	while (__HAL_UART_GET_FLAG(&huart1, UART_FLAG_RXNE) == RESET);
-	HAL_UART_Receive(&huart1, rev_buf+4, rev_len, 1000);
-
-
+	if (val <= min) 
+	{val = min;}
+	else if(val >= max)
+	{val = max;}
+	return val;
 }
 
 //同步写入
@@ -526,20 +530,25 @@ void enable_demo_test()
 // 读写位置测试
 void pos_demo_test()
 {
+	char str[30];
+	memset(&str,0,30);
+
 	int i=0;
 	for(i=0;i<=2;i++)
 	{
 		set_pos(SERO_1,100*i);
 		HAL_Delay(1000);
-
 	}
 
 	for(;i>0;i--)
 	{
 		set_pos(SERO_1,i*100);
 		HAL_Delay(1000);
-		read_pos(SERO_1);
+		sprintf(str,"surrent positon = %d",read_pos(SERO_1));
 		HAL_Delay(100);
+		sprintf(str,"surrent speed = %d",read_motion_speed(SERO_1));
+		HAL_Delay(100);		
+		MYSERIAL0.println(str);
 	}
 }
 
