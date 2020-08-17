@@ -8,7 +8,11 @@
 
 #include "stm32f4xx_hal.h"
 #include "dexarm_front_rotation.h"
+#include "interrupt.h"
 
+#define KEY_Pin GPIO_PIN_10
+#define KEY_GPIO_Port GPIOA
+#define KEY_EXTI_IRQn EXTI15_10_IRQn
 
 extern uint8_t usart_rev_ch;
 extern uint8_t front_rotation_init_flag;
@@ -127,8 +131,39 @@ static void MX_USART1_UART_Init(void)
 
 }
 
+/**
+  * @brief GPIO Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_GPIO_Init(void)
+{
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
+
+  /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOA_CLK_ENABLE();
+
+  /*Configure GPIO pin : KEY_Pin */
+  GPIO_InitStruct.Pin = KEY_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(KEY_GPIO_Port, &GPIO_InitStruct);
+
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 1, 0);
+  HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
+
+}
+
+void front_button_callback()
+{	
+	MYSERIAL0.println("Front button is pressed!\r\n");
+}
+
+
 void front_rotation_init(void){
 	MX_USART1_UART_Init();
+	stm32_interrupt_enable(KEY_GPIO_Port,KEY_Pin,front_button_callback,GPIO_MODE_IT_FALLING);
 }
 
 //除去协议头计算 ~校检和
