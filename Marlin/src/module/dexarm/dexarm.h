@@ -4,6 +4,7 @@
 #include "dexarm_position_reachable.h"
 #include "dexarm_position_sensor.h"
 #include "dexarm_update_manager.h"
+#include "dexarm_conveyor_belt.h"
 
 //Dexarm config
 extern int calibration_position_sensor_value[3];

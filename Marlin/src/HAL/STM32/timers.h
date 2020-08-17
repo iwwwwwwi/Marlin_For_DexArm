@@ -81,6 +81,10 @@
     #define TEMP_TIMER 14 // TIM7 is consumed by Software Serial if used.
   #endif
 
+  #ifndef RAIL_TIMER
+    #define RAIL_TIMER 5
+  #endif
+
 #elif defined(STM32F7xx)
 
   #define HAL_TIMER_RATE (F_CPU / 2) // frequency of timer peripherals
@@ -107,8 +111,13 @@
   #define TEMP_TIMER_IRQ_PRIO 14   // 14 = after hardware ISRs
 #endif
 
+#ifndef RAIL_TIMER_IRQ_PRIO
+  #define RAIL_TIMER_IRQ_PRIO 3
+#endif
+
 #define STEP_TIMER_NUM 0  // index of timer to use for stepper
 #define TEMP_TIMER_NUM 1  // index of timer to use for temperature
+#define RAIL_TIMER_NUM 2  // index of timer to use for rail stepper
 #define PULSE_TIMER_NUM STEP_TIMER_NUM
 
 #define TEMP_TIMER_FREQUENCY 1000   // Temperature::isr() is expected to be called at around 1kHz
@@ -127,6 +136,7 @@
 
 #define STEP_TIMER_IRQ_NAME _TIMER_IRQ_NAME(STEP_TIMER)
 #define TEMP_TIMER_IRQ_NAME _TIMER_IRQ_NAME(TEMP_TIMER)
+#define RAIL_TIMER_IRQ_NAME _TIMER_IRQ_NAME(RAIL_TIMER)
 
 #define ENABLE_STEPPER_DRIVER_INTERRUPT() HAL_timer_enable_interrupt(STEP_TIMER_NUM)
 #define DISABLE_STEPPER_DRIVER_INTERRUPT() HAL_timer_disable_interrupt(STEP_TIMER_NUM)
@@ -135,10 +145,15 @@
 #define ENABLE_TEMPERATURE_INTERRUPT() HAL_timer_enable_interrupt(TEMP_TIMER_NUM)
 #define DISABLE_TEMPERATURE_INTERRUPT() HAL_timer_disable_interrupt(TEMP_TIMER_NUM)
 
+#define ENABLE_RAIL_INTERRUPT() HAL_timer_enable_interrupt(RAIL_TIMER_NUM)
+#define DISABLE_RAIL_INTERRUPT() HAL_timer_disable_interrupt(RAIL_TIMER_NUM)
+
 extern void Step_Handler(HardwareTimer *htim);
 extern void Temp_Handler(HardwareTimer *htim);
+extern void Rail_Handler(HardwareTimer *htim);
 #define HAL_STEP_TIMER_ISR() void Step_Handler(HardwareTimer *htim)
 #define HAL_TEMP_TIMER_ISR() void Temp_Handler(HardwareTimer *htim)
+#define HAL_RAIL_TIMER_ISR() void Rail_Handler(HardwareTimer *htim)
 
 // ------------------------
 // Public Variables

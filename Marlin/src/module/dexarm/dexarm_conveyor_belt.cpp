@@ -1,0 +1,31 @@
+#include "../../MarlinCore.h"
+#include "../../module/planner.h"
+#include "../../gcode/gcode.h"
+
+bool init_flag = false;
+void rail_init(float feedRate_t, int direction) {
+    int rail_feedrate;
+    rail_feedrate = int(65535/feedRate_t);
+    OUT_WRITE(E0_ENABLE_PIN, LOW);
+    if(direction == 0){
+      OUT_WRITE(E0_DIR_PIN, LOW);
+    }else if(direction == 1){
+      OUT_WRITE(E0_DIR_PIN, HIGH);
+    }
+    HAL_timer_start(RAIL_TIMER_NUM, 4*planner.settings.axis_steps_per_mm[E_AXIS]);
+    ENABLE_RAIL_INTERRUPT();
+    init_flag = true;
+    HAL_timer_set_compare(RAIL_TIMER_NUM, rail_feedrate);
+}
+
+void rail_disable() {
+  DISABLE_RAIL_INTERRUPT();
+}
+
+HAL_RAIL_TIMER_ISR() {
+  HAL_timer_isr_prologue(RAIL_TIMER_NUM);
+
+  TOGGLE(E0_STEP_PIN);
+
+  HAL_timer_isr_epilogue(RAIL_TIMER_NUM);
+}
