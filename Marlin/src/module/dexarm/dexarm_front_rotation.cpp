@@ -9,6 +9,7 @@
 #include "stm32f4xx_hal.h"
 #include "dexarm_front_rotation.h"
 #include "interrupt.h"
+#include "../../module/stepper/indirection.h"
 
 #define KEY_Pin GPIO_PIN_10
 #define KEY_GPIO_Port GPIOA
@@ -158,12 +159,29 @@ static void MX_GPIO_Init(void)
 void front_button_callback()
 {	
 	MYSERIAL0.println("Front button is pressed!\r\n");
+
+	if(HAL_GPIO_ReadPin(KEY_GPIO_Port,KEY_Pin) == GPIO_PIN_RESET)
+	{
+		MYSERIAL0.println(" level down!\r\n");
+		DISABLE_AXIS_X();
+		DISABLE_AXIS_Y();
+		DISABLE_AXIS_Z();
+
+	}
+	else if(HAL_GPIO_ReadPin(KEY_GPIO_Port,KEY_Pin) == GPIO_PIN_SET)
+	{
+		MYSERIAL0.println(" level up!\r\n");
+		ENABLE_AXIS_X();
+		ENABLE_AXIS_Y();
+		ENABLE_AXIS_Z();		
+	}		
+
 }
 
 
 void front_rotation_init(void){
+	stm32_interrupt_enable(KEY_GPIO_Port,KEY_Pin,front_button_callback,GPIO_MODE_IT_RISING_FALLING);
 	MX_USART1_UART_Init();
-	stm32_interrupt_enable(KEY_GPIO_Port,KEY_Pin,front_button_callback,GPIO_MODE_IT_FALLING);
 }
 
 //除去协议头计算 ~校检和
