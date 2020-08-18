@@ -2,7 +2,6 @@
 #include "../../module/planner.h"
 #include "../../gcode/gcode.h"
 
-bool init_flag = false;
 void rail_init(float feedRate_t, int direction) {
     int rail_feedrate;
     rail_feedrate = int(65535/feedRate_t);
@@ -14,7 +13,6 @@ void rail_init(float feedRate_t, int direction) {
     }
     HAL_timer_start(RAIL_TIMER_NUM, 4*planner.settings.axis_steps_per_mm[E_AXIS]);
     ENABLE_RAIL_INTERRUPT();
-    init_flag = true;
     HAL_timer_set_compare(RAIL_TIMER_NUM, rail_feedrate);
 }
 
