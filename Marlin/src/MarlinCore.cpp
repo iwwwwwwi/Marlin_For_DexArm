@@ -181,6 +181,8 @@
   #include "libs/L64XX/L64XX_Marlin.h"
 #endif
 
+#include "module/update_manager.h"
+
 const char NUL_STR[] PROGMEM = "",
            M112_KILL_STR[] PROGMEM = "M112 Shutdown",
            G28_STR[] PROGMEM = "G28",
@@ -1160,6 +1162,8 @@ void setup() {
   marlin_state = MF_RUNNING;
 
   SETUP_LOG("setup() completed.");
+
+  check_update_flag();
 }
 
 /**

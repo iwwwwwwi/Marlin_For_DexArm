@@ -530,6 +530,9 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
       case 120: M120(); break;                                    // M120: Enable endstops
       case 121: M121(); break;                                    // M121: Disable endstops
 
+      case 2002: M2002(); break;                                    // M2002
+      case 2003: M2003(); break;
+      
       #if HOTENDS && HAS_LCD_MENU
         case 145: M145(); break;                                  // M145: Set material heatup parameters
       #endif

@@ -629,6 +629,9 @@ private:
   static void M120();
   static void M121();
 
+  static void M2002();
+  static void M2003();
+
   #if ENABLED(PARK_HEAD_ON_PAUSE)
     static void M125();
   #endif
