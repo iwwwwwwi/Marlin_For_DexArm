@@ -321,9 +321,9 @@ int position_M1111()
 				return 0;
 			}
 			
-			SERIAL_ECHOLNPAIR("fix_num = ",fix_num,"  Current Angle Diff Sum = ", diff_sum);
+			// SERIAL_ECHOLNPAIR("fix_num = ",fix_num,"  Current Angle Diff Sum = ", diff_sum);
 			
-			if(fix_num > 5)
+			if(fix_num > 7)
 			{
 				disable_all_steppers();
 				analysis_error(angle_diff_ary,fix_num,1);
@@ -576,9 +576,9 @@ int m1112_position(xyz_pos_t &position)
 				return 0;
 			}
 			
-			SERIAL_ECHOLNPAIR("fix_num = ",fix_num,"  Current Angle Diff Sum = ", diff_sum);
+			// SERIAL_ECHOLNPAIR("fix_num = ",fix_num,"  Current Angle Diff Sum = ", diff_sum);
 			
-			if(fix_num > 5)
+			if(fix_num > 7)
 			{
 				disable_all_steppers();
 				analysis_error(angle_diff_ary,fix_num,0);
