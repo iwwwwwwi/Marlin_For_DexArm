@@ -22,8 +22,6 @@ float start_angle_c = START_C_ANGLE;
 
 float dexarm_offset = front_module_offset + OFFSET_ROT;
 
-float delta_segments_per_second = SCARA_SEGMENTS_PER_SECOND;
-
 bool position_init_flag = false; //DexArm will not move without position init.
 bool current_posution_flag = false;
 
@@ -401,7 +399,7 @@ void inverse_kinematics(const xyz_pos_t &raw)
 		diff_angle[B_AXIS] = start_angle_b - diff_angle[B_AXIS];
 		diff_angle[C_AXIS] -= start_angle_c;
 	}
-	delta.set(diff_angle[0], diff_angle[1], diff_angle[2]);
+	//delta.set(diff_angle[0], diff_angle[1], diff_angle[2]);
 }
 
 void update_dexarm_offset(void)

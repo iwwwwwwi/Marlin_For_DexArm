@@ -77,7 +77,7 @@
  *
  */
 
-#define DEXARM
+//#define DEXARM
 
 #if ENABLED(DEXARM)
   #define SCARA_SEGMENTS_PER_SECOND 200
