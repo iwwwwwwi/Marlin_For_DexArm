@@ -42,8 +42,8 @@
 #define MS1_PIN            PB9
 #define MS2_PIN            PB8
 
-
-#define USING_MT6701_POSITION_SENSOR
+// Use sensor MT6701 or AS5600, default AS5600
+// #define USING_MT6701_POSITION_SENSOR
 
 //Position Sensor
 // DIGIPOT slave addresses
