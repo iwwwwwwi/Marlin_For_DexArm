@@ -87,9 +87,6 @@ void module_position_init()
 	}
 }
 
-/**
- * get axis position sensor diff of target&current position
- */
 int get_position_sensor_diff(int target_position, int current_position)
 {
 	int position_sensor_diff = 0;
@@ -97,11 +94,11 @@ int get_position_sensor_diff(int target_position, int current_position)
 	position_sensor_diff = current_position - target_position;
 	if (position_sensor_diff > MAX_POSITION_SENSOR_DIFF)
 	{
-		position_sensor_diff -= 4096;
+		position_sensor_diff -= MAX_POSITION_SENSOR_RANGE;
 	}
 	else if (position_sensor_diff < -1 * MAX_POSITION_SENSOR_DIFF)
 	{
-		position_sensor_diff += 4096;
+		position_sensor_diff += MAX_POSITION_SENSOR_RANGE;
 	}
 
 	return position_sensor_diff;
@@ -258,16 +255,14 @@ int position_M1111()
 	
 	while (1)
 	{
-		LOOP_ABC(axis) { current_position_sensor_value[axis] = position_sensor_value_read(axis); 
-		SERIAL_ECHOLNPAIR("axis = ",axis,"  sensor_value = ", current_position_sensor_value[axis]);
+		LOOP_ABC(axis) { current_position_sensor_value[axis] = position_sensor_value_read(axis);
 		}
-		// return 0 ;
 		LOOP_ABC(axis)
 		{
 			dif[axis] = get_position_sensor_diff(calibration_position_sensor_value[axis], current_position_sensor_value[axis]);
 		}
 
-		if ((dif[0] == 0) & (dif[1] == 0) & (dif[2] == 0))
+		if ((abs(dif[0]) LESS_THAN_VAL) && (abs(dif[1]) LESS_THAN_VAL) && (abs(dif[2]) LESS_THAN_VAL))
 		{
 			start_angle_a = START_A_ANGLE;
 			start_angle_b = START_B_ANGLE;
@@ -308,13 +303,13 @@ int position_M1111()
 			fix_num++;
 			LOOP_ABC(axis)
 			{
-				angle_diff[axis] = ((float)dif[axis]) * 360.0 / 4096.0;
+				angle_diff[axis] = ((float)dif[axis]) * 360.0 / (MAX_POSITION_SENSOR_RANGE*1.0);	
 				MYSERIAL0.print("angle diff is : ");
 				MYSERIAL0.println(angle_diff[axis]);
 				diff_sum = diff_sum + abs(angle_diff[axis]);
 				// save data
 				angle_diff_ary[fix_num][axis] = angle_diff[axis];
-				if(angle_diff[axis]>5000.0f)
+				if(angle_diff[axis]>(MAX_POSITION_SENSOR_RANGE * 1.0f))
 				{
 					disable_all_steppers();
 					calibration_error_log(axis,1);
@@ -349,6 +344,8 @@ int position_M1111()
 				fix_num = 0;				
 				return 0;
 			}
+
+
 			rotate_angle_diff(angle_diff);
 			planner.synchronize();			
 		}
@@ -502,20 +499,20 @@ int m1112_position(xyz_pos_t &position)
 		diff_target_calibration_angle[B_AXIS] = START_B_ANGLE - target_angle[B_AXIS];
 		diff_target_calibration_angle[C_AXIS] = target_angle[C_AXIS] - START_C_ANGLE;
 	}
-	LOOP_ABC(axis) { diff_position_sensor_value[axis] = (int)(diff_target_calibration_angle[axis] * 4096 / 360); }
+
+	LOOP_ABC(axis) { diff_position_sensor_value[axis] = (int)(diff_target_calibration_angle[axis] * MAX_POSITION_SENSOR_RANGE / 360); }
 	LOOP_ABC(axis)
 	{
 		target_position_sensor_value[axis] = calibration_position_sensor_value[axis] + diff_position_sensor_value[axis];
-		if (target_position_sensor_value[axis] > 4096)
+		if (target_position_sensor_value[axis] > MAX_POSITION_SENSOR_RANGE)
 		{
-			target_position_sensor_value[axis] -= 4096;
+			target_position_sensor_value[axis] -= MAX_POSITION_SENSOR_RANGE;
 		}
 		else if (target_position_sensor_value[axis] < 0)
 		{
-			target_position_sensor_value[axis] += 4096;
+			target_position_sensor_value[axis] += MAX_POSITION_SENSOR_RANGE;
 		}
 	}
-
 	while (1)
 	{
 		LOOP_ABC(axis) { current_position_sensor_value[axis] = position_sensor_value_read(axis); }
@@ -523,7 +520,7 @@ int m1112_position(xyz_pos_t &position)
 		{
 			dif[axis] = get_position_sensor_diff(target_position_sensor_value[axis], current_position_sensor_value[axis]);
 		}
-		if ((dif[0] == 0) & (dif[1] == 0) & (dif[2] == 0))
+		if ((abs(dif[0]) LESS_THAN_VAL) && (abs(dif[1]) LESS_THAN_VAL) && (abs(dif[2]) LESS_THAN_VAL))
 		{
 			start_angle_a = target_angle[0];
 			start_angle_b = target_angle[1];
@@ -561,13 +558,13 @@ int m1112_position(xyz_pos_t &position)
 			fix_num++;
 			LOOP_ABC(axis)
 			{
-				angle_diff[axis] = ((float)dif[axis]) * 360.0 / 4096.0;	
+				angle_diff[axis] = ((float)dif[axis]) * 360.0 / (MAX_POSITION_SENSOR_RANGE*1.0);	
 				MYSERIAL0.print("angle diff is : ");
 				MYSERIAL0.println(angle_diff[axis]);
 				diff_sum = diff_sum + abs(angle_diff[axis]);
 				// save data
 				angle_diff_ary[fix_num][axis] = angle_diff[axis];
-				if(angle_diff[axis]>5000.0f)
+				if(angle_diff[axis]>(MAX_POSITION_SENSOR_RANGE * 1.0f))
 				{
 					disable_all_steppers();
 					calibration_error_log(axis,0);

@@ -19,7 +19,15 @@
 #define START_Y 0
 #define START_Z 169.66
 
-#define MAX_POSITION_SENSOR_DIFF 2570
+#if defined(USING_MT6701_POSITION_SENSOR)
+    #define MAX_POSITION_SENSOR_RANGE 16384              // MT6701
+    #define MAX_POSITION_SENSOR_DIFF 2570*4
+    #define LESS_THAN_VAL <3   
+#else
+    #define MAX_POSITION_SENSOR_RANGE 4096              // AS5600
+    #define MAX_POSITION_SENSOR_DIFF 2570
+    #define LESS_THAN_VAL ==0   
+#endif
 
 #define NUM_AXIS 4
 
