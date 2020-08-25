@@ -258,7 +258,10 @@ int position_M1111()
 	
 	while (1)
 	{
-		LOOP_ABC(axis) { current_position_sensor_value[axis] = position_sensor_value_read(axis); }
+		LOOP_ABC(axis) { current_position_sensor_value[axis] = position_sensor_value_read(axis); 
+		SERIAL_ECHOLNPAIR("axis = ",axis,"  sensor_value = ", current_position_sensor_value[axis]);
+		}
+		// return 0 ;
 		LOOP_ABC(axis)
 		{
 			dif[axis] = get_position_sensor_diff(calibration_position_sensor_value[axis], current_position_sensor_value[axis]);
@@ -558,7 +561,7 @@ int m1112_position(xyz_pos_t &position)
 			fix_num++;
 			LOOP_ABC(axis)
 			{
-				angle_diff[axis] = ((float)dif[axis]) * 360.0 / 4096.0;
+				angle_diff[axis] = ((float)dif[axis]) * 360.0 / 4096.0;	
 				MYSERIAL0.print("angle diff is : ");
 				MYSERIAL0.println(angle_diff[axis]);
 				diff_sum = diff_sum + abs(angle_diff[axis]);

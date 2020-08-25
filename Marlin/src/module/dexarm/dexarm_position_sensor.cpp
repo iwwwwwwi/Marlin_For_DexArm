@@ -42,9 +42,19 @@ static void i2c_send(const uint8_t channel, const byte v) {
 }
 
 word position_sensor_value_read(const uint8_t channel) {
-  word value = i2c_read(channel, false, 0x0e);
+#if defined(USING_MT6701_POSITION_SENSOR)
+	word value_hight = i2c_read(channel, false, 0x03);
+	word value_low = i2c_read(channel, true, 0x04); 
+	word value = (((value_hight&0x00ff)<<8)|(value_low&0x00fc))>>2;
+	// value = 4096.0 - value * 4096.0 / 16384.0;
+	value = 4096 - value * 4096 / 16384;
+	// value = (16384 - value)/4;
+#else
+	word value = i2c_read(channel, false, 0x0e);
 	value <<= 8;
 	value |= i2c_read(channel, true, 0x0f); 
+#endif
+
 	return value;
 }
 
