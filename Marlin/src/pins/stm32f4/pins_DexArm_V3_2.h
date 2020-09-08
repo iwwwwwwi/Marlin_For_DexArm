@@ -140,4 +140,7 @@
 // Heaters / Fans
 //
 #define HEATER_0_PIN       PB0 // Heater0
-#define FAN_PIN            PD14  // Fan0
+#define FAN_PIN            PC0  // Fan0
+
+#define SPINDLE_LASER_ENA_PIN       PC1 // Heater0
+#define SPINDLE_LASER_PWM_PIN            PD14  // Fan0
