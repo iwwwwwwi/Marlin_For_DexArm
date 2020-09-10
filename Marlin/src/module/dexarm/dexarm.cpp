@@ -555,23 +555,23 @@ bool dexarm_position_is_reachable(const xyz_pos_t &position)
 	int tmp_z = (int(z + 0.5) + abs(ZMINARM)) / 2 + 0.5;
 	float tmps = sqrt(x * x + y * y) - dexarm_offset;
 
-	if (z > ZMAXARM || z < ZMINARM)
-	{
-		MYSERIAL0.println("Z beyond limit.....");
-		return false;
-	}
+	// if (z > ZMAXARM || z < ZMINARM)
+	// {
+	// 	MYSERIAL0.println("Z beyond limit.....");
+	// 	return false;
+	// }
 
-	if (y < 0)
-	{
-		MYSERIAL0.println("Y beyond limit.....");
-		return false;
-	}
+	// if (y < 0)
+	// {
+	// 	MYSERIAL0.println("Y beyond limit.....");
+	// 	return false;
+	// }
 
-	if (tmps < ARMLIMIT[tmp_z * 2 + 1] + 1 || tmps > ARMLIMIT[tmp_z * 2] - 1)
-	{
-		MYSERIAL0.println("XY beyond limit.....");
-		return false;
-	}
+	// if (tmps < ARMLIMIT[tmp_z * 2 + 1] + 1 || tmps > ARMLIMIT[tmp_z * 2] - 1)
+	// {
+	// 	MYSERIAL0.println("XY beyond limit.....");
+	// 	return false;
+	// }
 	return true;
 }
 

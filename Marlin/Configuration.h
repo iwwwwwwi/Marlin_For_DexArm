@@ -147,7 +147,7 @@
 
 // Choose the name from boards.h that matches your setup
 #ifndef MOTHERBOARD
-  #define MOTHERBOARD 
+  #define  MOTHERBOARD MOTHERBOARD 
 #endif
 
 // Name displayed in the LCD "Ready" message and Info menu

@@ -938,6 +938,31 @@ void GcodeSuite::process_next_command() {
   process_parsed_command();
 }
 
+void rail_test()
+{
+  while (1)
+  {
+      parser.parse((char *)"M2012F6000D0\r\n");
+      gcode.process_parsed_command();
+
+      for(int i=0;i<20;i++)
+      {
+           _delay_ms(1000);
+      }
+
+
+
+      parser.parse((char *)"M2012F6000D1\r\n");
+      gcode.process_parsed_command(); 
+
+      for(int i=0;i<20;i++)
+      {
+            _delay_ms(1000);
+      }
+  }
+  
+}
+
 /**
  * Run a series of commands, bypassing the command queue to allow
  * G-code "macros" to be called from within other G-code handlers.

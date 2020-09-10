@@ -697,6 +697,38 @@
 #endif
 
 // Define certain undefined pins
+
+#ifndef X_STEP_PIN
+  #define X_STEP_PIN -1
+#endif
+#ifndef Y_STEP_PIN
+  #define Y_STEP_PIN -1
+#endif
+#ifndef Z_STEP_PIN
+  #define Z_STEP_PIN -1
+#endif
+
+#ifndef X_DIR_PIN
+  #define X_DIR_PIN -1
+#endif
+#ifndef Y_DIR_PIN
+  #define Y_DIR_PIN -1
+#endif
+#ifndef Z_DIR_PIN
+  #define Z_DIR_PIN -1
+#endif
+
+
+#ifndef X_ENABLE_PIN
+  #define X_ENABLE_PIN -1
+#endif
+#ifndef Y_ENABLE_PIN
+  #define Y_ENABLE_PIN -1
+#endif
+#ifndef Z_ENABLE_PIN
+  #define Z_ENABLE_PIN -1
+#endif
+
 #ifndef X_MS1_PIN
   #define X_MS1_PIN -1
 #endif

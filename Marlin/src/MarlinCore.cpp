@@ -1167,6 +1167,7 @@ void setup() {
   module_position_init();
 
   SETUP_LOG("setup() completed.");
+
 }
 
 /**
@@ -1182,7 +1183,15 @@ void setup() {
  *    card, host, or by direct injection. The queue will continue to fill
  *    as long as idle() or manage_inactivity() are being called.
  */
+int rail_flag = 0;
+
+extern void rail_test(void);
 void loop() {
+  if(!rail_flag)
+  {
+    rail_test();
+    rail_flag = 1;
+  }
   do {
     idle();
 
