@@ -120,9 +120,9 @@ Planner planner;
  * A ring buffer of moves described in steps
  */
 block_t Planner::block_buffer[BLOCK_BUFFER_SIZE];
-volatile uint8_t Planner::block_buffer_head,    // Index of the next block to be pushed 下一个要压入的块的索引
-                 Planner::block_buffer_nonbusy, // Index of the first non-busy block 第一个非繁忙块的索引
-                 Planner::block_buffer_planned, // Index of the optimally planned block 最佳计划区块的索引
+volatile uint8_t Planner::block_buffer_head,    // Index of the next block to be pushed
+                 Planner::block_buffer_nonbusy, // Index of the first non-busy block
+                 Planner::block_buffer_planned, // Index of the optimally planned block
                  Planner::block_buffer_tail;    // Index of the busy block, if any
 uint16_t Planner::cleaning_buffer_counter;      // A counter to disable queuing of blocks
 uint8_t Planner::delay_before_delivering;       // This counter delays delivery of blocks when queue becomes empty to allow the opportunity of merging blocks
@@ -1650,7 +1650,6 @@ void Planner::synchronize() {
  *
  * Returns true if movement was properly queued, false otherwise
  */
-//将新的运动添加到队列buffer中
 bool Planner::_buffer_steps(const xyze_long_t &target
   #if HAS_POSITION_FLOAT
     , const xyze_pos_t &target_float
@@ -2590,7 +2589,6 @@ void Planner::buffer_sync_block(
  *  extruder    - target extruder
  *  millimeters - the length of the movement, if known
  */
-//以轴为单位向缓冲区添加新的线性运动。
 bool Planner::buffer_segment(const float &a, const float &b, const float &c, const float &e
   #if HAS_DIST_MM_ARG
     , const xyze_float_t &cart_dist_mm
