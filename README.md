@@ -18,10 +18,10 @@ Download earlier versions of Marlin on the [Releases page](https://github.com/Ma
 
 ## Building Marlin 2.0
 
-To build Marlin 2.0 you'll need [Arduino IDE 1.8.8 or newer](https://www.arduino.cc/en/main/software) or [PlatformIO](http://docs.platformio.org/en/latest/ide.html#platformio-ide). Detailed build and install instructions are posted at:
+To build Marlin 2.0 you'll need ~~[Arduino IDE 1.8.8 or newer](https://www.arduino.cc/en/main/software)~~ (DexArm not support Arduino IDE)or [PlatformIO](http://docs.platformio.org/en/latest/ide.html#platformio-ide). Detailed build and install instructions are posted at:
 
-  - [Installing Marlin (Arduino)](http://marlinfw.org/docs/basics/install_arduino.html)
-  - [Installing Marlin (VSCode)](http://marlinfw.org/docs/basics/install_platformio_vscode.html).
+  - ~~[Installing Marlin (Arduino)](http://marlinfw.org/docs/basics/install_arduino.html)~~(DexArm not support Arduino IDE)
+  - [Installing Marlin (VSCode)](http://marlinfw.org/docs/basics/install_platformio_vscode.html)(recommended).
 
 ### Supported Platforms
 
