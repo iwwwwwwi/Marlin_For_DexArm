@@ -42,10 +42,19 @@
 #define MS1_PIN            PB9
 #define MS2_PIN            PB8
 
+// Use sensor MT6701 or AS5600, default AS5600
+// #define USING_MT6701_POSITION_SENSOR
+
 //Position Sensor
 // DIGIPOT slave addresses
 #ifndef POSITION_SENSOR_I2C_ADDRESS
-  #define POSITION_SENSOR_I2C_ADDRESS 0x36              // unshifted slave address
+
+  #if defined(USING_MT6701_POSITION_SENSOR)
+    #define POSITION_SENSOR_I2C_ADDRESS 0x06              // MT6701
+  #else
+    #define POSITION_SENSOR_I2C_ADDRESS 0x36              // AS5600
+  #endif
+
 #endif
 #define POSITION_SENSOR_I2C_SCK_X PE0
 #define POSITION_SENSOR_I2C_SDA_X PE1

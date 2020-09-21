@@ -87,9 +87,6 @@ void module_position_init()
 	}
 }
 
-/**
- * get axis position sensor diff of target&current position
- */
 int get_position_sensor_diff(int target_position, int current_position)
 {
 	int position_sensor_diff = 0;
@@ -97,11 +94,11 @@ int get_position_sensor_diff(int target_position, int current_position)
 	position_sensor_diff = current_position - target_position;
 	if (position_sensor_diff > MAX_POSITION_SENSOR_DIFF)
 	{
-		position_sensor_diff -= 4096;
+		position_sensor_diff -= MAX_POSITION_SENSOR_RANGE;
 	}
 	else if (position_sensor_diff < -1 * MAX_POSITION_SENSOR_DIFF)
 	{
-		position_sensor_diff += 4096;
+		position_sensor_diff += MAX_POSITION_SENSOR_RANGE;
 	}
 
 	return position_sensor_diff;
@@ -190,6 +187,63 @@ void process_encoder(int x, int y, int z){
 	planner.synchronize();
 }
 
+static abce_pos_t angle_diff_ary[6];
+static abce_pos_t diff_sum;
+
+/*
+1:big arm
+2:small arm
+3:dipan xuanzhuan 
+*/
+void calibration_error_log(uint8_t num,uint8_t mode)
+{
+	char str[30];
+	memset(str,0,sizeof(char)*30);
+	if(mode)
+	{
+		sprintf(str,"Error M1111 failed : %d  ",num);
+	}
+	else 
+	{
+		sprintf(str,"Error M1112 failed : %d  ",num);
+	}
+		
+	MYSERIAL0.println(str);
+}
+
+
+void analysis_error(abce_pos_t angle_diff[],uint8_t count,uint8_t mode)
+{
+	if (count > 3)		
+	{
+		for(int i = 2; i < count;i++)
+		{
+			diff_sum[0] = diff_sum[0] + angle_diff[i][0];
+			diff_sum[1] = diff_sum[1] + angle_diff[i][1];
+			diff_sum[2] = diff_sum[2] + angle_diff[i][2];
+		}
+		for(int i = 0; i < 3;i++)
+		{
+			if (abs(diff_sum[i]) > 3.0f)
+				calibration_error_log(i,mode);
+		}
+	}
+	else if (count > 1)
+	{
+		for(int i = 0; i < 3;i++)
+		{
+			if (abs(angle_diff[count][i]) > 1.0f)
+				calibration_error_log(i,mode);
+		}
+	}
+	
+	// SERIAL_ECHOLNPAIR("1a = ",angle_diff_ary[1][0],"  1b = ", angle_diff_ary[1][1] ,"  1c = ", angle_diff_ary[1][2]);
+	// SERIAL_ECHOLNPAIR("2a = ",angle_diff_ary[2][0],"  2b = ", angle_diff_ary[2][1] ,"  2c = ", angle_diff_ary[2][2]);
+	// SERIAL_ECHOLNPAIR("3a = ",angle_diff_ary[3][0],"  3b = ", angle_diff_ary[3][1] ,"  3c = ", angle_diff_ary[3][2]);
+	// SERIAL_ECHOLNPAIR("4a = ",angle_diff_ary[4][0],"  4b = ", angle_diff_ary[4][1] ,"  3c = ", angle_diff_ary[4][2]);
+	memset(angle_diff_ary,0,sizeof(abce_pos_t)*6);
+		
+}
 /**
  * go to position M1111
  */
@@ -197,16 +251,18 @@ int position_M1111()
 {
 	int dif[3] = {0};
 	int current_position_sensor_value[3];
-
+	static uint8_t fix_num = 0;
+	
 	while (1)
 	{
-		LOOP_ABC(axis) { current_position_sensor_value[axis] = position_sensor_value_read(axis); }
+		LOOP_ABC(axis) { current_position_sensor_value[axis] = position_sensor_value_read(axis);
+		}
 		LOOP_ABC(axis)
 		{
 			dif[axis] = get_position_sensor_diff(calibration_position_sensor_value[axis], current_position_sensor_value[axis]);
 		}
 
-		if ((dif[0] == 0) & (dif[1] == 0) & (dif[2] == 0))
+		if ((abs(dif[0]) LESS_THAN_VAL) && (abs(dif[1]) LESS_THAN_VAL) && (abs(dif[2]) LESS_THAN_VAL))
 		{
 			start_angle_a = START_A_ANGLE;
 			start_angle_b = START_B_ANGLE;
@@ -230,25 +286,68 @@ int position_M1111()
 				planner.get_axis_position_degrees(A_AXIS),
 				planner.get_axis_position_degrees(B_AXIS),
 				planner.get_axis_position_degrees(C_AXIS)};
-			/*
-			SERIAL_ECHOLNPAIR(
+			fix_num = 0;
+			/*SERIAL_ECHOLNPAIR(
 				"Current Angle a=", deg[A_AXIS],
 				" b=", deg[B_AXIS],
 				" c=", deg[C_AXIS]);
 			//*/
+
 			return 1;
 		}
 		else
 		{
 			abc_pos_t angle_diff;
+			float diff_sum = 0.0;
+			uint8_t ret_flag = 0;
+			fix_num++;
 			LOOP_ABC(axis)
 			{
-				angle_diff[axis] = ((float)dif[axis]) * 360.0 / 4096.0;
+				angle_diff[axis] = ((float)dif[axis]) * 360.0 / (MAX_POSITION_SENSOR_RANGE*1.0);	
 				MYSERIAL0.print("angle diff is : ");
 				MYSERIAL0.println(angle_diff[axis]);
+				diff_sum = diff_sum + abs(angle_diff[axis]);
+				// save data
+				angle_diff_ary[fix_num][axis] = angle_diff[axis];
+				if(angle_diff[axis]>(MAX_POSITION_SENSOR_RANGE * 1.0f))
+				{
+					disable_all_steppers();
+					calibration_error_log(axis,1);
+					ret_flag = 1;
+				}
 			}
+			if(ret_flag)
+			{
+				return 0;
+			}
+			
+			// SERIAL_ECHOLNPAIR("fix_num = ",fix_num,"  Current Angle Diff Sum = ", diff_sum);
+			
+			if(fix_num > 7)
+			{
+				disable_all_steppers();
+				analysis_error(angle_diff_ary,fix_num,1);
+				fix_num = 0;
+				return 0;
+			}
+			else if (fix_num > 3 && diff_sum > 3.0f)		
+			{
+				disable_all_steppers();
+				analysis_error(angle_diff_ary,fix_num,1);
+				fix_num = 0;				
+				return 0;
+			}
+			else if (fix_num == 2 && diff_sum > 2.0f)
+			{
+				disable_all_steppers();
+				analysis_error(angle_diff_ary,fix_num,1);
+				fix_num = 0;				
+				return 0;
+			}
+
+
 			rotate_angle_diff(angle_diff);
-			planner.synchronize();
+			planner.synchronize();			
 		}
 	}
 }
@@ -391,6 +490,7 @@ int m1112_position(xyz_pos_t &position)
 
 	int diff_position_sensor_value[3];
 	int target_position_sensor_value[3] = {0};
+	static uint8_t fix_num = 0;
 
 	if (inverse_kinematics_dexarm(position, target_angle) == 0)
 	{
@@ -399,20 +499,20 @@ int m1112_position(xyz_pos_t &position)
 		diff_target_calibration_angle[B_AXIS] = START_B_ANGLE - target_angle[B_AXIS];
 		diff_target_calibration_angle[C_AXIS] = target_angle[C_AXIS] - START_C_ANGLE;
 	}
-	LOOP_ABC(axis) { diff_position_sensor_value[axis] = (int)(diff_target_calibration_angle[axis] * 4096 / 360); }
+
+	LOOP_ABC(axis) { diff_position_sensor_value[axis] = (int)(diff_target_calibration_angle[axis] * MAX_POSITION_SENSOR_RANGE / 360); }
 	LOOP_ABC(axis)
 	{
 		target_position_sensor_value[axis] = calibration_position_sensor_value[axis] + diff_position_sensor_value[axis];
-		if (target_position_sensor_value[axis] > 4096)
+		if (target_position_sensor_value[axis] > MAX_POSITION_SENSOR_RANGE)
 		{
-			target_position_sensor_value[axis] -= 4096;
+			target_position_sensor_value[axis] -= MAX_POSITION_SENSOR_RANGE;
 		}
 		else if (target_position_sensor_value[axis] < 0)
 		{
-			target_position_sensor_value[axis] += 4096;
+			target_position_sensor_value[axis] += MAX_POSITION_SENSOR_RANGE;
 		}
 	}
-
 	while (1)
 	{
 		LOOP_ABC(axis) { current_position_sensor_value[axis] = position_sensor_value_read(axis); }
@@ -420,7 +520,7 @@ int m1112_position(xyz_pos_t &position)
 		{
 			dif[axis] = get_position_sensor_diff(target_position_sensor_value[axis], current_position_sensor_value[axis]);
 		}
-		if ((dif[0] == 0) & (dif[1] == 0) & (dif[2] == 0))
+		if ((abs(dif[0]) LESS_THAN_VAL) && (abs(dif[1]) LESS_THAN_VAL) && (abs(dif[2]) LESS_THAN_VAL))
 		{
 			start_angle_a = target_angle[0];
 			start_angle_b = target_angle[1];
@@ -441,6 +541,7 @@ int m1112_position(xyz_pos_t &position)
 				planner.get_axis_position_degrees(A_AXIS),
 				planner.get_axis_position_degrees(B_AXIS),
 				planner.get_axis_position_degrees(C_AXIS)};
+			fix_num = 0;
 			/*
 			SERIAL_ECHOLNPAIR(
 				"Current Angle a=", deg[A_AXIS],
@@ -452,12 +553,55 @@ int m1112_position(xyz_pos_t &position)
 		else
 		{
 			abc_pos_t angle_diff;
+			float diff_sum = 0.0;
+			uint8_t ret_flag = 0;
+			fix_num++;
 			LOOP_ABC(axis)
 			{
-				angle_diff[axis] = ((float)dif[axis]) * 360.0 / 4096.0;
+				angle_diff[axis] = ((float)dif[axis]) * 360.0 / (MAX_POSITION_SENSOR_RANGE*1.0);	
+				MYSERIAL0.print("angle diff is : ");
+				MYSERIAL0.println(angle_diff[axis]);
+				diff_sum = diff_sum + abs(angle_diff[axis]);
+				// save data
+				angle_diff_ary[fix_num][axis] = angle_diff[axis];
+				if(angle_diff[axis]>(MAX_POSITION_SENSOR_RANGE * 1.0f))
+				{
+					disable_all_steppers();
+					calibration_error_log(axis,0);
+					ret_flag = 1;
+				}								
+			}
+			if(ret_flag)
+			{
+				return 0;
+			}
+			
+			// SERIAL_ECHOLNPAIR("fix_num = ",fix_num,"  Current Angle Diff Sum = ", diff_sum);
+			
+			if(fix_num > 7)
+			{
+				disable_all_steppers();
+				analysis_error(angle_diff_ary,fix_num,0);
+				fix_num = 0;
+				return 0;
+			}
+			else if (fix_num > 3 && diff_sum > 3.0f)		
+			{
+				disable_all_steppers();
+				analysis_error(angle_diff_ary,fix_num,0);
+				fix_num = 0;				
+				return 0;
+			}
+			else if (fix_num == 2 && diff_sum > 2.0f)
+			{
+				disable_all_steppers();
+				analysis_error(angle_diff_ary,fix_num,0);
+				fix_num = 0;				
+				return 0;
 			}
 			rotate_angle_diff(angle_diff);
-			planner.synchronize();
+			planner.synchronize();		
+
 		}
 	}
 }
