@@ -81,6 +81,7 @@
 
 #if ENABLED(DEXARM)
   #define SCARA_SEGMENTS_PER_SECOND 200
+  #define SCARA_MIN_SEGMENT_LENGTH 0.5f
 #endif
 
 //===========================================================================

@@ -800,7 +800,7 @@ FORCE_INLINE void segment_idle(millis_t &next_idle_ms) {
     uint16_t segments = delta_segments_per_second * seconds;
 
     // For SCARA enforce a minimum segment size
-    #if IS_SCARA
+    #if IS_SCARA | IS_DEXARM
       NOMORE(segments, cartesian_mm * RECIPROCAL(SCARA_MIN_SEGMENT_LENGTH));
     #endif
 
