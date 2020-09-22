@@ -257,6 +257,7 @@ int position_M1111()
 	{
 		LOOP_ABC(axis) { current_position_sensor_value[axis] = position_sensor_value_read(axis);
 		}
+		check_position_sensor(current_position_sensor_value);
 		LOOP_ABC(axis)
 		{
 			dif[axis] = get_position_sensor_diff(calibration_position_sensor_value[axis], current_position_sensor_value[axis]);
@@ -516,6 +517,7 @@ int m1112_position(xyz_pos_t &position)
 	while (1)
 	{
 		LOOP_ABC(axis) { current_position_sensor_value[axis] = position_sensor_value_read(axis); }
+		check_position_sensor(current_position_sensor_value);
 		LOOP_ABC(axis)
 		{
 			dif[axis] = get_position_sensor_diff(target_position_sensor_value[axis], current_position_sensor_value[axis]);

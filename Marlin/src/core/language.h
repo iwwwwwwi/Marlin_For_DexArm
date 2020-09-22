@@ -269,6 +269,8 @@
 #define STR_DEBUG_COMMUNICATION             "COMMUNICATION"
 #define STR_DEBUG_LEVELING                  "LEVELING"
 
+#define STR_POSITION_SENSOR_ERROR           "Position Sensor Error"
+#define STR_POSITION_SENSOR_AXIS                 ", Axis: "
 // LCD Menu Messages
 
 #define LANGUAGE_DATA_INCL_(M) STRINGIFY_(fontdata/langdata_##M.h)
