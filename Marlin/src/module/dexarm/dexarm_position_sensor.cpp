@@ -26,7 +26,7 @@ static SlowSoftI2CMaster pots[POSITION_SENSOR_NUM] = {
 static void position_sensor_error(const uint8_t position_sensor_state) {
 
   SERIAL_ERROR_START();
-  serialprintPGM(PSTR(STR_POSITION_SENSOR_ERROR));
+  serialprintPGM(PSTR(STR_POSITION_SENSOR_READ_ERROR));
   SERIAL_ECHOPGM(STR_POSITION_SENSOR_AXIS);
 
   if((position_sensor_state&(0x01<<0)) > 0)

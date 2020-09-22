@@ -190,13 +190,66 @@ void process_encoder(int x, int y, int z){
 static abce_pos_t angle_diff_ary[6];
 static abce_pos_t diff_sum;
 
+static void position_sensor_diff_error(const uint8_t position_sensor_state)
+{
+
+	SERIAL_ERROR_START();
+	serialprintPGM(PSTR(STR_POSITION_SENSOR_DIFF_ERROR));
+	SERIAL_ECHOPGM(STR_POSITION_SENSOR_AXIS);
+
+	if ((position_sensor_state & (0x01 << 0)) > 0)
+		SERIAL_ECHO("A ");
+	if ((position_sensor_state & (0x01 << 1)) > 0)
+		SERIAL_ECHO("B ");
+	if ((position_sensor_state & (0x01 << 2)) > 0)
+		SERIAL_ECHO("C ");
+
+	SERIAL_EOL();
+	kill();
+}
+
+void check_position_sensor_diff(const int sensor_diff[])
+{
+	uint8_t position_sensor_diff_state = 0;
+	SERIAL_ECHO("Position Sensor Diff A:");
+	SERIAL_ECHO(sensor_diff[0]);
+
+	SERIAL_ECHO(" B: ");
+	SERIAL_ECHO(sensor_diff[1]);
+
+	SERIAL_ECHO(" C: ");
+	SERIAL_ECHO(sensor_diff[2]);
+	SERIAL_EOL();
+
+	if (sensor_diff[1] > 1200)
+	{
+		position_sensor_diff_state |= 0x01 << 1;
+	}else if(sensor_diff[1] < -1200){
+		position_sensor_diff_state |= 0x01 << 1;
+	}
+
+	if (sensor_diff[2] > 950)
+	{
+		position_sensor_diff_state |= 0x01 << 2;
+	}else if(sensor_diff[2] < -950){
+		position_sensor_diff_state |= 0x01 << 2;
+	}
+
+	if (position_sensor_diff_state > 0)
+	{
+		position_sensor_diff_error(position_sensor_diff_state);
+	}
+}
+
 /*
 1:big arm
 2:small arm
 3:dipan xuanzhuan 
 */
-void calibration_error_log(uint8_t num,uint8_t mode)
+void calibration_error_log(uint8_t num, uint8_t mode)
 {
+
+	/*
 	char str[30];
 	memset(str,0,sizeof(char)*30);
 	if(mode)
@@ -209,13 +262,49 @@ void calibration_error_log(uint8_t num,uint8_t mode)
 	}
 		
 	MYSERIAL0.println(str);
+*/
+	SERIAL_ERROR_START();
+	if (mode)
+	{
+		serialprintPGM(PSTR(STR_POSITION_M1111_ERROR));
+	}
+	else
+	{
+		serialprintPGM(PSTR(STR_POSITION_M1112_ERROR));
+	}
+	SERIAL_ECHOPGM(STR_POSITION_SENSOR_AXIS);
+
+	if (num == 0)
+	{
+		SERIAL_ECHO("A ");
+	}
+	else if (num == 1)
+	{
+		SERIAL_ECHO("B ");
+	}
+	else if (num == 2)
+	{
+		SERIAL_ECHO("C ");
+	}
+
+	SERIAL_EOL();
 }
 
 
-void analysis_error(abce_pos_t angle_diff[],uint8_t count,uint8_t mode)
+void analysis_error(abce_pos_t angle_diff[], uint8_t count, uint8_t mode)
 {
-	if (count > 3)		
-	{
+	if (count > 7)		
+	{ 
+		if (mode){
+			SERIAL_ECHO("M1111 Error");
+			SERIAL_EOL();	
+		}
+		else{
+			SERIAL_ECHO("M1112 Error");
+			SERIAL_EOL();	
+		}
+	}
+	else if (count > 3){
 		for(int i = 2; i < count;i++)
 		{
 			diff_sum[0] = diff_sum[0] + angle_diff[i][0];
@@ -263,6 +352,8 @@ int position_M1111()
 			dif[axis] = get_position_sensor_diff(calibration_position_sensor_value[axis], current_position_sensor_value[axis]);
 		}
 
+		check_position_sensor_diff(dif);
+
 		if ((abs(dif[0]) LESS_THAN_VAL) && (abs(dif[1]) LESS_THAN_VAL) && (abs(dif[2]) LESS_THAN_VAL))
 		{
 			start_angle_a = START_A_ANGLE;
@@ -302,17 +393,29 @@ int position_M1111()
 			float diff_sum = 0.0;
 			uint8_t ret_flag = 0;
 			fix_num++;
+
 			LOOP_ABC(axis)
 			{
-				angle_diff[axis] = ((float)dif[axis]) * 360.0 / (MAX_POSITION_SENSOR_RANGE*1.0);	
+				angle_diff[axis] = ((float)dif[axis]) * 360.0 / (MAX_POSITION_SENSOR_RANGE*1.0);
+				/*
+				if(axis == 0){
+					MYSERIAL0.print("A axis");
+				}else if(axis == 1){
+					MYSERIAL0.print("B axis");
+				}else if(axis == 2){
+					MYSERIAL0.print("C axis");
+				}
+				MYSERIAL0.print(axis);	
 				MYSERIAL0.print("angle diff is : ");
 				MYSERIAL0.println(angle_diff[axis]);
+				*/
 				diff_sum = diff_sum + abs(angle_diff[axis]);
 				// save data
 				angle_diff_ary[fix_num][axis] = angle_diff[axis];
 				if(angle_diff[axis]>(MAX_POSITION_SENSOR_RANGE * 1.0f))
 				{
-					disable_all_steppers();
+					//disable_all_steppers();
+					kill();
 					calibration_error_log(axis,1);
 					ret_flag = 1;
 				}
@@ -326,21 +429,24 @@ int position_M1111()
 			
 			if(fix_num > 7)
 			{
-				disable_all_steppers();
+				//disable_all_steppers();
+				kill();
 				analysis_error(angle_diff_ary,fix_num,1);
 				fix_num = 0;
 				return 0;
 			}
 			else if (fix_num > 3 && diff_sum > 3.0f)		
 			{
-				disable_all_steppers();
+				//disable_all_steppers();
+				kill();
 				analysis_error(angle_diff_ary,fix_num,1);
 				fix_num = 0;				
 				return 0;
 			}
 			else if (fix_num == 2 && diff_sum > 2.0f)
 			{
-				disable_all_steppers();
+				//disable_all_steppers();
+				kill();
 				analysis_error(angle_diff_ary,fix_num,1);
 				fix_num = 0;				
 				return 0;
@@ -522,6 +628,9 @@ int m1112_position(xyz_pos_t &position)
 		{
 			dif[axis] = get_position_sensor_diff(target_position_sensor_value[axis], current_position_sensor_value[axis]);
 		}
+
+		check_position_sensor_diff(dif);
+
 		if ((abs(dif[0]) LESS_THAN_VAL) && (abs(dif[1]) LESS_THAN_VAL) && (abs(dif[2]) LESS_THAN_VAL))
 		{
 			start_angle_a = target_angle[0];
@@ -561,14 +670,15 @@ int m1112_position(xyz_pos_t &position)
 			LOOP_ABC(axis)
 			{
 				angle_diff[axis] = ((float)dif[axis]) * 360.0 / (MAX_POSITION_SENSOR_RANGE*1.0);	
-				MYSERIAL0.print("angle diff is : ");
-				MYSERIAL0.println(angle_diff[axis]);
+				//MYSERIAL0.print("angle diff is : ");
+				//MYSERIAL0.println(angle_diff[axis]);
 				diff_sum = diff_sum + abs(angle_diff[axis]);
 				// save data
 				angle_diff_ary[fix_num][axis] = angle_diff[axis];
 				if(angle_diff[axis]>(MAX_POSITION_SENSOR_RANGE * 1.0f))
 				{
-					disable_all_steppers();
+					//disable_all_steppers();
+					kill();
 					calibration_error_log(axis,0);
 					ret_flag = 1;
 				}								
@@ -582,21 +692,24 @@ int m1112_position(xyz_pos_t &position)
 			
 			if(fix_num > 7)
 			{
-				disable_all_steppers();
+				//disable_all_steppers();
+				kill();
 				analysis_error(angle_diff_ary,fix_num,0);
 				fix_num = 0;
 				return 0;
 			}
 			else if (fix_num > 3 && diff_sum > 3.0f)		
 			{
-				disable_all_steppers();
+				//disable_all_steppers();
+				kill();
 				analysis_error(angle_diff_ary,fix_num,0);
 				fix_num = 0;				
 				return 0;
 			}
 			else if (fix_num == 2 && diff_sum > 2.0f)
 			{
-				disable_all_steppers();
+				//disable_all_steppers();
+				kill();
 				analysis_error(angle_diff_ary,fix_num,0);
 				fix_num = 0;				
 				return 0;
