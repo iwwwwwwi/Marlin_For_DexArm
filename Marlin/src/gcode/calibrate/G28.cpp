@@ -53,6 +53,7 @@
 
 #define DEBUG_OUT ENABLED(DEBUG_LEVELING_FEATURE)
 #include "../../core/debug_out.h"
+#include "../../module/dexarm/dexarm.h"
 
 #if ENABLED(QUICK_HOME)
 
@@ -203,6 +204,13 @@
  *
  */
 void GcodeSuite::G28() {
+  #ifdef G28_REDEFINE_TO_M1112
+    xyz_pos_t position;
+    position[X_AXIS] = 0;
+		position[Y_AXIS] = 300;
+		position[Z_AXIS] = 0;
+		m1112_position(position);
+  #elif
   if (DEBUGGING(LEVELING)) {
     DEBUG_ECHOLNPGM(">>> G28");
     log_machine_info();
@@ -516,5 +524,6 @@ void GcodeSuite::G28() {
       const uint8_t cv = L64XX::chain[j];
       L64xxManager.set_param((L64XX_axis_t)cv, L6470_ABS_POS, stepper.position(L64XX_axis_xref[cv]));
     }
+  #endif
   #endif
 }
