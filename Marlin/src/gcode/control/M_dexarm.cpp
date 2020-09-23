@@ -440,6 +440,23 @@ void GcodeSuite::M2101()
 	MYSERIAL0.println("ok");
 }
 
+void GcodeSuite::M2012()
+{
+	feedRate_t e_feedrate_mm_s;
+	int direction;
+  	if (parser.linearval('F') > 0)
+    	e_feedrate_mm_s = parser.value_feedrate();
+	if (parser.linearval('D') > 0)
+    	direction =parser.floatval('D', 999);;
+	rail_init(e_feedrate_mm_s, direction);
+}
+
+void GcodeSuite::M2013()
+{
+	SERIAL_ECHOPAIR("Conveyor belt stop\r\n");
+	rail_disable();
+}
+
 void GcodeSuite::M5010000()
 {
 	SERIAL_ECHOPAIR("Reset UART3 GPIO Level, please connect touch screen to DexARM\r\n");

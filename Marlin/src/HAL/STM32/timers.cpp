@@ -30,12 +30,13 @@
 // Local defines
 // ------------------------
 
-#define NUM_HARDWARE_TIMERS 2
+#define NUM_HARDWARE_TIMERS 3
 
 #define __TIMER_DEV(X) TIM##X
 #define _TIMER_DEV(X) __TIMER_DEV(X)
 #define STEP_TIMER_DEV _TIMER_DEV(STEP_TIMER)
 #define TEMP_TIMER_DEV _TIMER_DEV(TEMP_TIMER)
+#define RAIL_TIMER_DEV _TIMER_DEV(RAIL_TIMER)
 
 // ------------------------
 // Private Variables
@@ -75,6 +76,10 @@ void HAL_timer_start(const uint8_t timer_num, const uint32_t frequency) {
         // The prescale factor is computed automatically for HERTZ_FORMAT
         timer_instance[timer_num]->setOverflow(frequency, HERTZ_FORMAT);
         break;
+      case RAIL_TIMER_NUM: // TEMP TIMER - any available 16bit timer
+        timer_instance[timer_num] = new HardwareTimer(RAIL_TIMER_DEV);
+        timer_instance[timer_num]->setOverflow(frequency, HERTZ_FORMAT);
+        break;
     }
 
     HAL_timer_enable_interrupt(timer_num);
@@ -98,6 +103,9 @@ void HAL_timer_start(const uint8_t timer_num, const uint32_t frequency) {
       case TEMP_TIMER_NUM:
         HAL_NVIC_SetPriority(TEMP_TIMER_IRQ_NAME, TEMP_TIMER_IRQ_PRIO, 0);
         break;
+        case RAIL_TIMER_NUM:
+        HAL_NVIC_SetPriority(RAIL_TIMER_IRQ_NAME, RAIL_TIMER_IRQ_PRIO, 0);
+        break;
     }
   }
 }
@@ -111,6 +119,9 @@ void HAL_timer_enable_interrupt(const uint8_t timer_num) {
       break;
     case TEMP_TIMER_NUM:
       timer_instance[timer_num]->attachInterrupt(Temp_Handler);
+      break;
+    case RAIL_TIMER_NUM:
+      timer_instance[timer_num]->attachInterrupt(Rail_Handler);
       break;
     }
   }

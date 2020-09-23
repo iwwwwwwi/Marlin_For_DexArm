@@ -652,6 +652,8 @@ private:
   static void M2007();
   static void M2010();
   static void M2011();
+  static void M2012();
+  static void M2013();
   static void M2100();
   static void M2101();
   static void M5010000();
