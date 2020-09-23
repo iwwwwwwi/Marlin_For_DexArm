@@ -1,4 +1,6 @@
 #include "../../inc/MarlinConfig.h"
+#include "../../core/language.h"
+
 #include <SlowSoftI2CMaster.h>  //https://github.com/stawel/SlowSoftI2CMaster
 
 #define POSITION_SENSOR_NUM 3
@@ -20,6 +22,44 @@ static SlowSoftI2CMaster pots[POSITION_SENSOR_NUM] = {
     , SlowSoftI2CMaster { sda_pins[Y_AXIS], sck_pins[Y_AXIS] }
       , SlowSoftI2CMaster { sda_pins[Z_AXIS], sck_pins[Z_AXIS] }
 };
+
+static void position_sensor_error(const uint8_t position_sensor_state) {
+
+  SERIAL_ERROR_START();
+  serialprintPGM(PSTR(STR_POSITION_SENSOR_READ_ERROR));
+  SERIAL_ECHOPGM(STR_POSITION_SENSOR_AXIS);
+
+  if((position_sensor_state&(0x01<<0)) > 0)
+    SERIAL_ECHO("A ");
+  if((position_sensor_state&(0x01<<1)) > 0)
+    SERIAL_ECHO("B ");
+  if((position_sensor_state&(0x01<<2)) > 0)
+    SERIAL_ECHO("C ");
+
+  SERIAL_EOL();
+}
+
+void check_position_sensor(const int sensor_value[]) {
+  uint8_t position_sensor_state = 0;
+  for(int i=0; i<3; i++){
+    if(sensor_value[i] > 4096){
+      position_sensor_state |= 0x01<<i;
+    }
+  }
+
+  if(position_sensor_state > 0){
+    position_sensor_error(position_sensor_state);
+    SERIAL_ECHO("Position Sensor A:");
+	  SERIAL_ECHO(sensor_value[0]);
+
+	  SERIAL_ECHO(" B: ");
+	  SERIAL_ECHO(sensor_value[1]);
+
+	  SERIAL_ECHO(" C: ");
+	  SERIAL_ECHO(sensor_value[2]);
+    SERIAL_EOL();
+  }
+}
 
 static uint8_t i2c_read(const uint8_t channel, bool last, const uint8_t reg_address) {
   uint8_t value = 0;
@@ -54,7 +94,6 @@ word position_sensor_value_read(const uint8_t channel) {
 	value <<= 8;
 	value |= i2c_read(channel, true, 0x0f); 
 #endif
-
 	return value;
 }
 

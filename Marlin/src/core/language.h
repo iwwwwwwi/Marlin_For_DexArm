@@ -252,10 +252,10 @@
 
 #define STR_STOPPED_HEATER                  ", system stopped! Heater_ID: "
 #define STR_REDUNDANCY                      "Heater switched off. Temperature difference between temp sensors is too high !"
-#define STR_T_HEATING_FAILED                "Heating failed"
-#define STR_T_THERMAL_RUNAWAY               "Thermal Runaway"
-#define STR_T_MAXTEMP                       "MAXTEMP triggered"
-#define STR_T_MINTEMP                       "MINTEMP triggered"
+#define STR_T_HEATING_FAILED                "200, Heating failed"
+#define STR_T_THERMAL_RUNAWAY               "201, Thermal Runaway"
+#define STR_T_MAXTEMP                       "202, MAXTEMP triggered"
+#define STR_T_MINTEMP                       "203, MINTEMP triggered"
 #define STR_ERR_PROBING_FAILED              "Probing Failed"
 #define STR_ZPROBE_OUT_SER                  "Z Probe Past Bed"
 
@@ -268,6 +268,12 @@
 #define STR_DEBUG_DRYRUN                    "DRYRUN"
 #define STR_DEBUG_COMMUNICATION             "COMMUNICATION"
 #define STR_DEBUG_LEVELING                  "LEVELING"
+
+#define STR_POSITION_SENSOR_READ_ERROR      "100, Position Sensor Read Error"
+#define STR_POSITION_SENSOR_AXIS            ", Axis: "
+#define STR_POSITION_M1111_ERROR            "101, M1111 Error"
+#define STR_POSITION_M1112_ERROR            "102, M1112 Error"
+#define STR_POSITION_SENSOR_DIFF_ERROR      "103, Position Sensor Diff Error"
 
 // LCD Menu Messages
 
