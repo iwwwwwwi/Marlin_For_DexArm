@@ -89,6 +89,9 @@ void GcodeSuite::M3_M4(const bool is_M4) {
   #endif
 }
 */
+
+millis_t last_laser_power_on_time = 0;
+
 void GcodeSuite::M3_M4(const bool is_M4) {
   const uint8_t p = parser.byteval('P');
 	static uint16_t M3S = 255;
@@ -101,6 +104,11 @@ void GcodeSuite::M3_M4(const bool is_M4) {
     #if ENABLED(LASER_SYNCHRONOUS_M106_M107)
       planner.buffer_sync_block(BLOCK_FLAG_SYNC_FANS);
     #endif
+    #if LASER_AUTO_PROTECTION_TIMEOUTS > 0
+      if(s > 0){
+        last_laser_power_on_time = millis();
+      }
+    #endif 
   }
 }
 

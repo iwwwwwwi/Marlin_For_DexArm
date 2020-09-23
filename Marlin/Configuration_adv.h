@@ -1771,6 +1771,10 @@
 // This "wait" is only sent when the buffer is empty. 1 second is a good value here.
 #define NO_TIMEOUTS 1000 // Milliseconds
 
+//When the laser is power on, if Marlin does not receive G0/G1/G2/G3 motion commands
+// within 60 seconds, the laser will auto power off
+#define LASER_AUTO_PROTECTION_TIMEOUTS 60000 // Milliseconds
+
 // Some clients will have this feature soon. This could make the NO_TIMEOUTS unnecessary.
 //#define ADVANCED_OK
 

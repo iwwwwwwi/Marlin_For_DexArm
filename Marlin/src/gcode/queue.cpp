@@ -76,6 +76,7 @@ char GCodeQueue::command_buffer[BUFSIZE][MAX_CMD_SIZE];
   int16_t GCodeQueue::port[BUFSIZE];
 #endif
 
+extern millis_t last_laser_power_on_time;
 /**
  * Serial command injection
  */
@@ -477,10 +478,24 @@ void GCodeQueue::get_serial_commands() {
             return gcode_line_error(PSTR(STR_ERR_NO_CHECKSUM), i);
         #endif
 
+        #if LASER_AUTO_PROTECTION_TIMEOUTS > 0
+          if(last_laser_power_on_time > 0){
+            char* g_command = strchr(command, 'G');
+            if (g_command) {
+              last_laser_power_on_time = millis();
+            }else{
+              if (ELAPSED(ms, last_laser_power_on_time + LASER_AUTO_PROTECTION_TIMEOUTS)) {
+                analogWrite(FAN_PIN, 0);
+                SERIAL_ECHO("Laser Auto Protection");
+                SERIAL_EOL();
+                last_laser_power_on_time = 0;
+              }
+            }
+          }
+        #endif
         //
         // Movement commands give an alert when the machine is stopped
         //
-
         if (IsStopped()) {
           char* gpos = strchr(command, 'G');
           if (gpos) {
