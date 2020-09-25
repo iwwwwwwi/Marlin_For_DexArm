@@ -221,17 +221,13 @@ void check_position_sensor_diff(const int sensor_diff[])
 	SERIAL_ECHO(sensor_diff[2]);
 	SERIAL_EOL();
 
-	if (sensor_diff[1] > 1200)
+	if (abs(sensor_diff[1]) > 1200)
 	{
-		position_sensor_diff_state |= 0x01 << 1;
-	}else if(sensor_diff[1] < -1200){
 		position_sensor_diff_state |= 0x01 << 1;
 	}
 
-	if (sensor_diff[2] > 950)
+	if (abs(sensor_diff[2]) > 1300)
 	{
-		position_sensor_diff_state |= 0x01 << 2;
-	}else if(sensor_diff[2] < -950){
 		position_sensor_diff_state |= 0x01 << 2;
 	}
 
