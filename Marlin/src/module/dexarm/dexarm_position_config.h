@@ -15,8 +15,8 @@
 #define START_C_ANGLE 99.60
 #define OFFSET_ROT 12.5
 
-#define START_X 109.55
-#define START_Y 0
+#define START_X 0
+#define START_Y 109.55
 #define START_Z 169.66
 
 #if defined(USING_MT6701_POSITION_SENSOR)

@@ -32,7 +32,7 @@ bool laser_fan_flag = false;
 bool position_init_flag = false; //DexArm will not move without position init.
 bool current_position_flag = false;
 
-float current_position_init[XYZE] = {START_X + dexarm_offset, START_Y, START_Z, 0.0};
+float current_position_init[XYZE] = {START_X, START_Y + dexarm_offset, START_Z, 0.0};
 
 move_mode_t G0_MOVE_MODE = FAST_MODE;
 
@@ -359,8 +359,8 @@ int position_M1111()
 			start_angle_a = START_A_ANGLE;
 			start_angle_b = START_B_ANGLE;
 			start_angle_c = START_C_ANGLE;
-			current_position[0] = START_X + dexarm_offset;
-			current_position[1] = START_Y;
+			current_position[0] = START_X;
+			current_position[1] = START_Y + dexarm_offset;
 			current_position[2] = START_Z;
 			position_init_flag = true;
 
@@ -481,7 +481,7 @@ char inverse_kinematics_dexarm_xy_legace(const xyz_pos_t &position, abc_pos_t &a
 	float z = position.z;
 
 	//apply_leveling
-	z += (x_axis_scaling_factor * x + y_axis_scaling_factor * (y - 200));
+	z += (x_axis_scaling_factor * x + y_axis_scaling_factor * (y - 300));
 
 	float tmps = sqrt(x * x + y * y);
 
