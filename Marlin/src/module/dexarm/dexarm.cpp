@@ -415,8 +415,8 @@ int position_M1111()
 				if(angle_diff[axis]>(MAX_POSITION_SENSOR_RANGE * 1.0f))
 				{
 					//disable_all_steppers();
-					kill();
 					calibration_error_log(axis,1);
+					kill();
 					ret_flag = 1;
 				}
 			}
@@ -430,24 +430,24 @@ int position_M1111()
 			if(fix_num > 7)
 			{
 				//disable_all_steppers();
-				kill();
 				analysis_error(angle_diff_ary,fix_num,1);
+				kill();
 				fix_num = 0;
 				return 0;
 			}
 			else if (fix_num > 3 && diff_sum > 3.0f)		
 			{
 				//disable_all_steppers();
-				kill();
 				analysis_error(angle_diff_ary,fix_num,1);
+				kill();
 				fix_num = 0;				
 				return 0;
 			}
 			else if (fix_num == 2 && diff_sum > 2.0f)
 			{
 				//disable_all_steppers();
-				kill();
 				analysis_error(angle_diff_ary,fix_num,1);
+				kill();
 				fix_num = 0;				
 				return 0;
 			}
@@ -678,8 +678,8 @@ int m1112_position(xyz_pos_t &position)
 				if(angle_diff[axis]>(MAX_POSITION_SENSOR_RANGE * 1.0f))
 				{
 					//disable_all_steppers();
-					kill();
 					calibration_error_log(axis,0);
+					kill();
 					ret_flag = 1;
 				}								
 			}
@@ -693,24 +693,24 @@ int m1112_position(xyz_pos_t &position)
 			if(fix_num > 7)
 			{
 				//disable_all_steppers();
-				kill();
 				analysis_error(angle_diff_ary,fix_num,0);
+				kill();
 				fix_num = 0;
 				return 0;
 			}
 			else if (fix_num > 3 && diff_sum > 3.0f)		
 			{
 				//disable_all_steppers();
-				kill();
 				analysis_error(angle_diff_ary,fix_num,0);
+				kill();
 				fix_num = 0;				
 				return 0;
 			}
 			else if (fix_num == 2 && diff_sum > 2.0f)
 			{
 				//disable_all_steppers();
-				kill();
 				analysis_error(angle_diff_ary,fix_num,0);
+				kill();
 				fix_num = 0;				
 				return 0;
 			}
