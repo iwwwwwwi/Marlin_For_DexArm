@@ -7,6 +7,13 @@
 #include "../../core/debug_out.h"
 #include "../../module/dexarm/dexarm.h"
 
+#if ENABLED(SENSORLESS_HOMING)
+  #include "../../feature/tmc_util.h"
+#endif
+#include "../../module/planner.h"
+#include "../../module/stepper.h"
+#include "../../module/endstops.h"
+
 typedef enum
 {
 	NO_NEED_CONFIRM = 0U,
@@ -361,6 +368,33 @@ void GcodeSuite::M2004()
 	{
 		SERIAL_ECHOPAIR("M2004 is <Cancel enter update> CMD, should be used after CMD M2002\r\n");
 	}
+}
+
+void GcodeSuite::M2005()
+{
+	/*
+	//#if ENABLED(SENSORLESS_HOMING)
+    	//sensorless_t stealth_states;
+  	//#endif
+
+    // Disable stealthChop if used. Enable diag1 pin on driver.
+    #if ENABLED(SENSORLESS_HOMING)
+      stealth_states = start_sensorless_homing_per_axis(X_AXIS);
+	  stealth_states = start_sensorless_homing_per_axis(Y_AXIS);
+	  stealth_states = start_sensorless_homing_per_axis(Z_AXIS);
+    #endif
+	*/
+	DEBUG_ECHOLNPGM("Enable E TMC StallGuard");
+	tmc_enable_stallguard(stepperX);
+	tmc_enable_stallguard(stepperY);
+	tmc_enable_stallguard(stepperZ);
+	tmc_enable_stallguard(stepperE0);
+	endstops.enable(true);
+}
+
+void GcodeSuite::M2006()
+{
+
 }
 
 void GcodeSuite::M2007()

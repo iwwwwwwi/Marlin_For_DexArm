@@ -72,6 +72,7 @@
 //#define Y_MAX_PIN        
 #define Z_MIN_PIN          PG8
 #define Z_MAX_PIN          PG8
+#define E0_MIN_PIN          PE10
 
 //
 // Steppers

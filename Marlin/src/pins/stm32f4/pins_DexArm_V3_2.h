@@ -70,8 +70,9 @@
 //#define X_MAX_PIN        
 #define Y_MIN_PIN          PB6
 //#define Y_MAX_PIN        
-#define Z_MIN_PIN          PE10//PE8
-#define Z_MAX_PIN          PE10//PE8
+#define Z_MIN_PIN          PE8
+#define Z_MAX_PIN          PE8
+#define E0_MIN_PIN         PE10
 
 //
 // Steppers
@@ -89,7 +90,7 @@
  #ifndef Y_CS_PIN
   #define Y_CS_PIN         PF8
 #endif
-
+/*
 #define Z_STEP_PIN         PE13
 #define Z_DIR_PIN          PE14
 #define Z_ENABLE_PIN       PE15
@@ -103,8 +104,8 @@
 #ifndef E0_CS_PIN
   #define E0_CS_PIN        PF10
 #endif
+*/
 
-/*
 #define Z_STEP_PIN         PA4
 #define Z_DIR_PIN          PA5
 #define Z_ENABLE_PIN       PE9
@@ -118,7 +119,7 @@
 #ifndef E0_CS_PIN
   #define E0_CS_PIN        PB3
 #endif
-*/
+
 #if HAS_TMC220x
   /**
    * TMC2208/TMC2209 stepper drivers
@@ -146,20 +147,18 @@
 
   #define Y_SERIAL_TX_PIN  PD7
   #define Y_SERIAL_RX_PIN  PB3
-
+/*
   #define Z_SERIAL_TX_PIN  PE11
   #define Z_SERIAL_RX_PIN  PE12
 
   #define E0_SERIAL_TX_PIN PA6
   #define E0_SERIAL_RX_PIN PA7
-
-/*
+*/
   #define Z_SERIAL_TX_PIN  PA6
   #define Z_SERIAL_RX_PIN  PA7
 
   #define E0_SERIAL_TX_PIN PE11
   #define E0_SERIAL_RX_PIN PE12
-*/
   // Reduce baud rate to improve software serial reliability
   #define TMC_BAUD_RATE 19200
 #endif
