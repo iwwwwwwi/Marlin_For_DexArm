@@ -1062,8 +1062,12 @@ void Temperature::manage_heater() {
 
     HOTEND_LOOP() {
       #if ENABLED(THERMAL_PROTECTION_HOTENDS)
-        if (degHotend(e) > temp_range[e].maxtemp)
-          _temp_error((heater_ind_t)e, str_t_thermal_runaway, GET_TEXT(MSG_THERMAL_RUNAWAY));
+        if (!laser_protection_enable_flag)
+        {
+          if (degHotend(e) > temp_range[e].maxtemp){
+            _temp_error((heater_ind_t)e, str_t_thermal_runaway, GET_TEXT(MSG_THERMAL_RUNAWAY));
+          }
+        }
       #endif
 
       #if HEATER_IDLE_HANDLER

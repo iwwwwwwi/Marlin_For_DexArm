@@ -57,8 +57,8 @@ void GcodeSuite::M888(void)
 			break;
 		case 3:
 			front_module_offset = _3D_MODULE_OFFSET;
-			laser_fan_flag = false;
-			OUT_WRITE(HEATER_0_PIN, LOW);
+			//laser_fan_flag = false;
+			//OUT_WRITE(HEATER_0_PIN, LOW);
 			MYSERIAL0.println("THE CURRENT MODULE IS 3D");
 			(void)settings.save();
 			update_dexarm_offset();
@@ -102,18 +102,18 @@ void GcodeSuite::M888(void)
 		}
 		case 14:
 		{
-			SERIAL_ECHOPAIR("Laser protection Fun Start");
-			SERIAL_EOL();
-			laser_fan_flag = true;
-			OUT_WRITE(HEATER_0_PIN, HIGH);
+			//SERIAL_ECHOPAIR("Laser protection Fun Start");
+			//SERIAL_EOL();
+			//laser_fan_flag = true;
+			//OUT_WRITE(HEATER_0_PIN, HIGH);
 			break;
 		}
 		case 15:
 		{
-			SERIAL_ECHOPAIR("Laser protection Fun Stop");
-			SERIAL_EOL();
-			laser_fan_flag = false;
-			OUT_WRITE(HEATER_0_PIN, LOW);
+			//SERIAL_ECHOPAIR("Laser protection Fun Stop");
+			//SERIAL_EOL();
+			//laser_fan_flag = false;
+			//OUT_WRITE(HEATER_0_PIN, LOW);
 			break;
 		}
 		}
