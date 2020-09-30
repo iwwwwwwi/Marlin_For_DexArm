@@ -306,6 +306,11 @@ void protected_pin_err() {
   SERIAL_ERROR_MSG(STR_ERR_PROTECTED_PIN);
 }
 
+void stop_laser_and_heater() {
+  analogWrite(HEATER_0_PIN, 0);
+  analogWrite(FAN_PIN, 0);
+}
+
 void quickstop_stepper() {
   planner.quick_stop();
   planner.synchronize();

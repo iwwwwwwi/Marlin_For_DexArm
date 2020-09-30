@@ -75,6 +75,7 @@ void kill(PGM_P const lcd_error=nullptr, PGM_P const lcd_component=nullptr, cons
 void minkill(const bool steppers_off=false);
 
 void quickstop_stepper();
+void stop_laser_and_heater();
 
 // Global State of the firmware
 enum MarlinState : uint8_t {
