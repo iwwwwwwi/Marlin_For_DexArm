@@ -372,24 +372,19 @@ void GcodeSuite::M2004()
 
 void GcodeSuite::M2005()
 {
-	/*
-	//#if ENABLED(SENSORLESS_HOMING)
-    	//sensorless_t stealth_states;
-  	//#endif
-
-    // Disable stealthChop if used. Enable diag1 pin on driver.
-    #if ENABLED(SENSORLESS_HOMING)
-      stealth_states = start_sensorless_homing_per_axis(X_AXIS);
-	  stealth_states = start_sensorless_homing_per_axis(Y_AXIS);
-	  stealth_states = start_sensorless_homing_per_axis(Z_AXIS);
-    #endif
-	*/
-	DEBUG_ECHOLNPGM("Enable E TMC StallGuard");
-	tmc_enable_stallguard(stepperX);
-	tmc_enable_stallguard(stepperY);
-	tmc_enable_stallguard(stepperZ);
-	tmc_enable_stallguard(stepperE0);
-	endstops.enable(true);
+	feedRate_t home_feedrate_high = 30;
+	feedRate_t home_feedrate_low = 10;
+	int16_t homing_threshold_first = 60;
+	int16_t homing_threshold_second = 60;
+	bool check_param = parser.seen('X') & parser.seen('Y')& parser.seen('Z')& parser.seen('E');
+	if (check_param)
+	{
+		home_feedrate_high = parser.intval('X', 999);
+		home_feedrate_low = parser.intval('Y', 999);
+		homing_threshold_first = parser.intval('Z', 999);
+		homing_threshold_second = parser.intval('E', 999);
+	}
+	sliding_rail_home(home_feedrate_high, home_feedrate_low, homing_threshold_first, homing_threshold_second);
 }
 
 void GcodeSuite::M2006()

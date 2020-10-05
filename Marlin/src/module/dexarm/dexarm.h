@@ -6,6 +6,7 @@
 #include "dexarm_update_manager.h"
 #include "dexarm_front_rotation.h"
 #include "dexarm_conveyor_belt.h"
+#include "dexarm_sliding_rail.h"
 
 //Dexarm config
 extern int calibration_position_sensor_value[3];
@@ -20,6 +21,7 @@ extern bool laser_door_open_flag;
 extern bool laser_fan_flag;
 
 extern bool position_init_flag;
+extern bool INVERT_E0_DIR;
 
 typedef enum {
     FAST_MODE,
