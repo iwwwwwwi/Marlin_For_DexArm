@@ -388,14 +388,6 @@
             #endif
             break;
         #endif
-
-        #if E0_SENSORLESS
-          case E0_AXIS:
-            #if AXIS_HAS_STALLGUARD(E0)
-              if (index < 2) stepperE0.homing_threshold(value);
-            #endif
-            break;
-        #endif
       }
     }
 
@@ -428,11 +420,6 @@
         #endif
         #if AXIS_HAS_STALLGUARD(Z4)
           tmc_print_sgt(stepperZ4);
-        #endif
-      #endif
-      #if E0_SENSORLESS
-        #if AXIS_HAS_STALLGUARD(E0)
-          tmc_print_sgt(stepperE0);
         #endif
       #endif
     }

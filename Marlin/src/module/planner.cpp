@@ -1578,10 +1578,6 @@ void Planner::quick_stop() {
 
 void Planner::endstop_triggered(const AxisEnum axis) {
   // Record stepper position and discard the current block
-  //*
-	SERIAL_ECHOLNPAIR(
-		"endstop_triggered: ", axis);
-	//*/
   stepper.endstop_triggered(axis);
 }
 

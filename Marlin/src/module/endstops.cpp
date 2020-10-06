@@ -519,15 +519,11 @@ void _O2 Endstops::report_states() {
 
 // Check endstops - Could be called from Temperature ISR!
 void Endstops::update() {
-  //*
-	SERIAL_ECHOLNPAIR(
-		"Endstops.update1");
-	//*/
+
   #if !ENDSTOP_NOISE_THRESHOLD
     if (!abort_enabled()) return;
   #endif
-	SERIAL_ECHOLNPAIR(
-		"Endstops.update2");
+
   #define UPDATE_ENDSTOP_BIT(AXIS, MINMAX) SET_BIT_TO(live_state, _ENDSTOP(AXIS, MINMAX), (READ(_ENDSTOP_PIN(AXIS, MINMAX)) != _ENDSTOP_INVERTING(AXIS, MINMAX)))
   #define COPY_LIVE_STATE(SRC_BIT, DST_BIT) SET_BIT_TO(live_state, DST_BIT, TEST(live_state, SRC_BIT))
 
@@ -670,16 +666,10 @@ void Endstops::update() {
       UPDATE_ENDSTOP_BIT(Z, MAX);
     #endif
   #endif
-  //*
-	SERIAL_ECHOLNPAIR(
-		"live_state1: ", live_state);
-	//*/
 
   #if HAS_E0_MIN && !E_SPI_SENSORLESS
     UPDATE_ENDSTOP_BIT(E0, MIN);
   #endif
-	SERIAL_ECHOLNPAIR(
-		"live_state2: ", live_state);
   #if ENDSTOP_NOISE_THRESHOLD
 
     /**
@@ -715,14 +705,14 @@ void Endstops::update() {
     if (TEST_ENDSTOP(_ENDSTOP(AXIS, MINMAX))) { \
       _ENDSTOP_HIT(AXIS, MINMAX); \
       planner.endstop_triggered(_AXIS(AXIS)); \
-    }else{SERIAL_ECHOLNPAIR("***");} \
+    } \
   }while(0)
 
   #define PROCESS_ENDSTOP1(AXIS, MINMAX) do { \
     if (lice_s) { \
       _ENDSTOP_HIT(AXIS, MINMAX); \
       planner.endstop_triggered(_AXIS(AXIS)); \
-    }else{SERIAL_ECHOLNPAIR("***");} \
+    } \
   }while(0)
 
   // Call the endstop triggered routine for dual endstops
@@ -793,10 +783,7 @@ void Endstops::update() {
     }
   #endif
 
-  //#define PROCESS_ENDSTOP_E0(MINMAX) if (E0_##MINMAX##_TEST()) PROCESS_ENDSTOP(E0, MINMAX)
   #define PROCESS_ENDSTOP_E0(MINMAX) PROCESS_ENDSTOP(E0, MINMAX)
-  //#define PROCESS_ENDSTOP_E0(MINMAX) PROCESS_ENDSTOP1(E0, MINMAX)
-
   // Now, we must signal, after validation, if an endstop limit is pressed or not
   if (stepper.axis_is_moving(X_AXIS)) {
     if (stepper.motor_direction(X_AXIS_HEAD)) { // -direction
@@ -853,21 +840,13 @@ void Endstops::update() {
     }
   }
 
-  SERIAL_ECHOLNPAIR("###");
   if (stepper.axis_is_moving(E0_AXIS)) {
     if (stepper.motor_direction(E0_AXIS_HEAD)) { // -direction
       #if HAS_E0_MIN || (E_SPI_SENSORLESS && E_HOME_DIR < 0)
-        SERIAL_ECHOLNPAIR("HAS_E0_MIN");
         PROCESS_ENDSTOP_E0(MIN);
-      #else
-        SERIAL_ECHOLNPAIR("motor_direction else");
       #endif
     }
-    else { // +direction
-	    SERIAL_ECHOLNPAIR("axis_is_moving else");
-    }
   }
-  SERIAL_ECHOLNPAIR("###");
 
 } // Endstops::update()
 
