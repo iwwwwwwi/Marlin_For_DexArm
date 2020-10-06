@@ -176,6 +176,12 @@ void Endstops::init() {
     #endif
   #endif
 
+  #if HAS_E0_MIN
+    #if ENABLED(ENDSTOPPULLUP_E0MIN)
+      SET_INPUT_PULLUP(E0_MIN_PIN);
+    #endif
+  #endif
+
   #if HAS_X_MAX
     #if ENABLED(ENDSTOPPULLUP_XMAX)
       SET_INPUT_PULLUP(X_MAX_PIN);
@@ -553,6 +559,8 @@ void Endstops::update() {
     #define Z_AXIS_HEAD Z_AXIS
   #endif
 
+  #define E0_AXIS_HEAD E0_AXIS
+
   /**
    * Check and update endstops
    */
@@ -659,6 +667,9 @@ void Endstops::update() {
     #endif
   #endif
 
+  #if HAS_E0_MIN && !E_SPI_SENSORLESS
+    UPDATE_ENDSTOP_BIT(E0, MIN);
+  #endif
   #if ENDSTOP_NOISE_THRESHOLD
 
     /**
@@ -692,6 +703,13 @@ void Endstops::update() {
   // Call the endstop triggered routine for single endstops
   #define PROCESS_ENDSTOP(AXIS, MINMAX) do { \
     if (TEST_ENDSTOP(_ENDSTOP(AXIS, MINMAX))) { \
+      _ENDSTOP_HIT(AXIS, MINMAX); \
+      planner.endstop_triggered(_AXIS(AXIS)); \
+    } \
+  }while(0)
+
+  #define PROCESS_ENDSTOP1(AXIS, MINMAX) do { \
+    if (lice_s) { \
       _ENDSTOP_HIT(AXIS, MINMAX); \
       planner.endstop_triggered(_AXIS(AXIS)); \
     } \
@@ -765,6 +783,7 @@ void Endstops::update() {
     }
   #endif
 
+  #define PROCESS_ENDSTOP_E0(MINMAX) PROCESS_ENDSTOP(E0, MINMAX)
   // Now, we must signal, after validation, if an endstop limit is pressed or not
   if (stepper.axis_is_moving(X_AXIS)) {
     if (stepper.motor_direction(X_AXIS_HEAD)) { // -direction
@@ -820,6 +839,15 @@ void Endstops::update() {
       #endif
     }
   }
+
+  if (stepper.axis_is_moving(E0_AXIS)) {
+    if (stepper.motor_direction(E0_AXIS_HEAD)) { // -direction
+      #if HAS_E0_MIN || (E_SPI_SENSORLESS && E_HOME_DIR < 0)
+        PROCESS_ENDSTOP_E0(MIN);
+      #endif
+    }
+  }
+
 } // Endstops::update()
 
 #if ENABLED(SPI_ENDSTOPS)

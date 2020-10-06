@@ -210,7 +210,7 @@ void GcodeSuite::G28() {
 		position[Y_AXIS] = 300;
 		position[Z_AXIS] = 0;
 		m1112_position(position);
-  #elif
+  #else
   if (DEBUGGING(LEVELING)) {
     DEBUG_ECHOLNPGM(">>> G28");
     log_machine_info();

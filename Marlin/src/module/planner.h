@@ -657,6 +657,7 @@ class Planner {
       // Allow do_homing_move to access internal functions, such as buffer_segment.
       friend void do_homing_move(const AxisEnum, const float, const feedRate_t);
       friend void rotate_angle_diff(abc_float_t &angle_abc);
+      friend void sliding_rail_home(feedRate_t home_feedrate_high, feedRate_t home_feedrate_low, int16_t homing_threshold_first, int16_t homing_threshold_second);
   #endif
 
     /**

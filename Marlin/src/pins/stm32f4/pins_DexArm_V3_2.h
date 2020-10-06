@@ -72,6 +72,7 @@
 //#define Y_MAX_PIN        
 #define Z_MIN_PIN          PE8
 #define Z_MAX_PIN          PE8
+#define E0_MIN_PIN         PE10
 
 //
 // Steppers
@@ -137,7 +138,6 @@
 
   #define E0_SERIAL_TX_PIN PE11
   #define E0_SERIAL_RX_PIN PE12
-
   // Reduce baud rate to improve software serial reliability
   #define TMC_BAUD_RATE 19200
 #endif

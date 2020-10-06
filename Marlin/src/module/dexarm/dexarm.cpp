@@ -34,6 +34,8 @@ bool current_position_flag = false;
 
 float current_position_init[XYZE] = {START_X, START_Y + dexarm_offset, START_Z, 0.0};
 
+bool INVERT_E0_DIR = true;
+
 move_mode_t G0_MOVE_MODE = FAST_MODE;
 
 #define CURRENT_POSITION_INIT                                            \

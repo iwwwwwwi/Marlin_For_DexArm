@@ -7,6 +7,13 @@
 #include "../../core/debug_out.h"
 #include "../../module/dexarm/dexarm.h"
 
+#if ENABLED(SENSORLESS_HOMING)
+  #include "../../feature/tmc_util.h"
+#endif
+#include "../../module/planner.h"
+#include "../../module/stepper.h"
+#include "../../module/endstops.h"
+
 typedef enum
 {
 	NO_NEED_CONFIRM = 0U,
@@ -361,6 +368,28 @@ void GcodeSuite::M2004()
 	{
 		SERIAL_ECHOPAIR("M2004 is <Cancel enter update> CMD, should be used after CMD M2002\r\n");
 	}
+}
+
+void GcodeSuite::M2005()
+{
+	feedRate_t home_feedrate_high = 30;
+	feedRate_t home_feedrate_low = 10;
+	int16_t homing_threshold_first = 60;
+	int16_t homing_threshold_second = 60;
+	bool check_param = parser.seen('X') & parser.seen('Y')& parser.seen('Z')& parser.seen('E');
+	if (check_param)
+	{
+		home_feedrate_high = parser.intval('X', 999);
+		home_feedrate_low = parser.intval('Y', 999);
+		homing_threshold_first = parser.intval('Z', 999);
+		homing_threshold_second = parser.intval('E', 999);
+	}
+	sliding_rail_home(home_feedrate_high, home_feedrate_low, homing_threshold_first, homing_threshold_second);
+}
+
+void GcodeSuite::M2006()
+{
+
 }
 
 void GcodeSuite::M2007()

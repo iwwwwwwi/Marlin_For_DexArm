@@ -67,4 +67,7 @@ void setup_endstop_interrupts() {
   #if HAS_Z_MIN_PROBE_PIN
     attachInterrupt(Z_MIN_PROBE_PIN, endstop_ISR, CHANGE);
   #endif
+  #if HAS_E0_MIN
+    attachInterrupt(E0_MIN_PIN, endstop_ISR, CHANGE);
+  #endif
 }
