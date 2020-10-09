@@ -318,6 +318,7 @@ void homeaxis(const AxisEnum axis);
         #endif
       );
     #endif
+    return true;
   }
 
   inline bool position_is_reachable(const xy_pos_t &pos, const float inset=0) {

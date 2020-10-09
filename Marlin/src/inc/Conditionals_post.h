@@ -1967,10 +1967,10 @@
     // Probing points may be verified at compile time within the radius
     // using static_assert(HYPOT2(X2-X1,Y2-Y1)<=sq(DELTA_PRINTABLE_RADIUS),"bad probe point!")
     // so that may be added to SanityCheck.h in the future.
-    #define _MESH_MIN_X (X_MIN_BED + MESH_INSET)
-    #define _MESH_MIN_Y (Y_MIN_BED + MESH_INSET)
-    #define _MESH_MAX_X (X_MAX_BED - (MESH_INSET))
-    #define _MESH_MAX_Y (Y_MAX_BED - (MESH_INSET))
+    #define _MESH_MIN_X -45
+    #define _MESH_MIN_Y 255
+    #define _MESH_MAX_X 45
+    #define _MESH_MAX_Y 345
   #else
     // Boundaries for Cartesian probing based on set limits
     #define _MESH_MIN_X (_MAX(X_MIN_BED + MESH_INSET, X_MIN_POS))  // UBL is careful not to probe off the bed.  It does not
@@ -1981,16 +1981,16 @@
 
   // These may be overridden in Configuration.h if a smaller area is desired
   #ifndef MESH_MIN_X
-    #define MESH_MIN_X _MESH_MIN_X
+    #define MESH_MIN_X -45
   #endif
   #ifndef MESH_MIN_Y
-    #define MESH_MIN_Y _MESH_MIN_Y
+    #define MESH_MIN_Y 255
   #endif
   #ifndef MESH_MAX_X
-    #define MESH_MAX_X _MESH_MAX_X
+    #define MESH_MAX_X 45
   #endif
   #ifndef MESH_MAX_Y
-    #define MESH_MAX_Y _MESH_MAX_Y
+    #define MESH_MAX_Y 345
   #endif
 #else
   #undef MESH_MIN_X
