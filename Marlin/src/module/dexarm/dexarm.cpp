@@ -35,6 +35,7 @@ bool current_position_flag = false;
 float current_position_init[XYZE] = {START_X, START_Y + dexarm_offset, START_Z, 0.0};
 
 bool INVERT_E0_DIR = true;
+extern bool home_z_before_xy;
 
 move_mode_t G0_MOVE_MODE = FAST_MODE;
 
@@ -50,26 +51,21 @@ void print_current_module_type()
 	if (fabs(front_module_offset - PEN_MODULE_OFFSET) < 0.1)
 	{
 		MYSERIAL0.println("The current module is PEN");
-	}
-
-	if (fabs(front_module_offset - LASER_MODULE_OFFSET) < 0.1)
+	}else if (fabs(front_module_offset - LASER_MODULE_OFFSET) < 0.1)
 	{
 		MYSERIAL0.println("The current module is LASER");
-	}
-
-	if (fabs(front_module_offset - PUMP_MODULE_OFFSET) < 0.1)
+	}else if (fabs(front_module_offset - PUMP_MODULE_OFFSET) < 0.1)
 	{
 		MYSERIAL0.println("The current module is PUMP");
-	}
-
-	if (fabs(front_module_offset - _3D_MODULE_OFFSET) < 0.1)
+	}else if (fabs(front_module_offset - _3D_MODULE_OFFSET) < 0.1)
 	{
 		MYSERIAL0.println("The current module is 3D");
-	}
-
-	if (fabs(front_module_offset - CAMERA_MODULE_OFFSET) < 0.1)
+	}else if (fabs(front_module_offset - CAMERA_MODULE_OFFSET) < 0.1)
 	{
 		MYSERIAL0.println("The current module is Camera");
+	}else
+	{
+		MYSERIAL0.println("The current module maybe Custom Module!");
 	}
 }
 
@@ -340,6 +336,8 @@ int position_M1111()
 	int current_position_sensor_value[3];
 	static uint8_t fix_num = 0;
 	
+	home_z_before_xy = false;
+
 	while (1)
 	{
 		LOOP_ABC(axis) { current_position_sensor_value[axis] = position_sensor_value_read(axis);
@@ -597,6 +595,7 @@ int m1112_position(xyz_pos_t &position)
 	int target_position_sensor_value[3] = {0};
 	static uint8_t fix_num = 0;
 
+	home_z_before_xy = false;
 	if (inverse_kinematics_dexarm(position, target_angle) == 0)
 	{
 		diff_target_calibration_angle[A_AXIS] = target_angle[A_AXIS] - START_A_ANGLE;

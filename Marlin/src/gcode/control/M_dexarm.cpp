@@ -23,10 +23,13 @@ typedef enum
 
 int need_confirm_state = NO_NEED_CONFIRM;
 
-void re_calibration(float distance)
+void re_calibration(float target_distance, float actual_distance)
 {
-	float y;
-	front_module_offset -= 300 - ((distance / 2) / 0.25007f);
+	float angle_cos = 0;
+	angle_cos = target_distance / 600;
+	MYSERIAL0.println("angle: ");
+	MYSERIAL0.println(angle_cos);
+	front_module_offset -= 300 - ((actual_distance / 2) / angle_cos);
 	MYSERIAL0.println("Re Calibration OFFSET_FRONT: ");
 	MYSERIAL0.println(front_module_offset);
 }
@@ -74,9 +77,17 @@ void GcodeSuite::M888(void)
 		//case 4:  front_module_offset = CAMERA_MODULE_OFFSET;    MYSERIAL0.println("THE CURRENT MODULE IS Camera");    break;
 		case 5:
 		{
-			const float DISTANCE = parser.floatval('S');
-			re_calibration(DISTANCE);
+			const float target_distance = parser.floatval('T');
+			const float actual_distance = parser.floatval('A');
+			if(target_distance < 100){
+				MYSERIAL0.println("Target distance must be greater than 100, 150 is suggested");
+				break;
+			}
+			re_calibration(target_distance, actual_distance);
 			MYSERIAL0.println("THE CURRENT MODULE IS Custom Module");
+			(void)settings.save();
+			update_dexarm_offset();
+			planner.buffer_line(current_position, 30, active_extruder);
 			break;
 		}
 		case 10:

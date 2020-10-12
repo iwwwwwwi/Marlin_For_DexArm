@@ -203,14 +203,10 @@
  *  Z   Home to the Z endstop
  *
  */
+extern bool position_init_flag;
+bool home_z_before_xy = false;
+
 void GcodeSuite::G28() {
-  #ifdef G28_REDEFINE_TO_M1112
-    xyz_pos_t position;
-    position[X_AXIS] = 0;
-		position[Y_AXIS] = 300;
-		position[Z_AXIS] = 0;
-		m1112_position(position);
-  #else
   if (DEBUGGING(LEVELING)) {
     DEBUG_ECHOLNPGM(">>> G28");
     log_machine_info();
@@ -319,19 +315,32 @@ void GcodeSuite::G28() {
     #endif
 
   #else // NOT DELTA
-
+/*
     const bool homeX = parser.seen('X'), homeY = parser.seen('Y'), homeZ = parser.seen('Z'),
                home_all = homeX == homeY && homeX == homeZ, // All or None
                doX = home_all || homeX, doY = home_all || homeY, doZ = home_all || homeZ;
-
+*/
+    const bool homeX = parser.seen('X'), homeY = parser.seen('Y'), homeZ = parser.seen('Z'),
+               //home_all = homeX == homeY && homeX == homeZ, // All or None
+               doX = homeX, doY = homeY, doZ = homeZ;
+    if(!homeX&!homeY&!homeZ){
+      xyz_pos_t position;
+      position[X_AXIS] = 0;
+		  position[Y_AXIS] = 300;
+		  position[Z_AXIS] = 0;
+		  m1112_position(position);
+      return;
+    }
+    position_init_flag = false;
     destination = current_position;
-
+    
     #if Z_HOME_DIR > 0  // If homing away from BED do Z first
-
-      if (doZ) homeaxis(Z_AXIS);
-
+      if (doZ){
+        homeaxis(Z_AXIS);
+        home_z_before_xy = true;
+      } 
     #endif
-
+/*
     const float z_homing_height =
       (DISABLED(UNKNOWN_Z_NO_RAISE) || TEST(axis_known_position, Z_AXIS))
         ? (parser.seenval('R') ? parser.value_linear_units() : Z_HOMING_HEIGHT)
@@ -345,6 +354,7 @@ void GcodeSuite::G28() {
         do_blocking_move_to_z(destination.z);
       }
     }
+*/
 
     #if ENABLED(QUICK_HOME)
 
@@ -354,7 +364,12 @@ void GcodeSuite::G28() {
 
     // Home Y (before X)
     if (ENABLED(HOME_Y_BEFORE_X) && (doY || (ENABLED(CODEPENDENT_XY_HOMING) && doX)))
-      homeaxis(Y_AXIS);
+      if(home_z_before_xy){
+        homeaxis(Y_AXIS);
+      }else{
+        SERIAL_ECHOLNPAIR("Please Home Z before home XY.");
+      }
+      
 
     // Home X
     if (doX || (doY && ENABLED(CODEPENDENT_XY_HOMING) && DISABLED(HOME_Y_BEFORE_X))) {
@@ -378,15 +393,21 @@ void GcodeSuite::G28() {
         active_extruder_parked = true;
 
       #else
-
-        homeaxis(X_AXIS);
-
+        if(home_z_before_xy){
+          homeaxis(X_AXIS);
+        }else{
+          SERIAL_ECHOLNPAIR("Please Home Z before home XY.");
+        }
       #endif
     }
 
     // Home Y (after X)
     if (DISABLED(HOME_Y_BEFORE_X) && doY)
-      homeaxis(Y_AXIS);
+      if(home_z_before_xy){
+        homeaxis(Y_AXIS);
+      }else{
+        SERIAL_ECHOLNPAIR("Please Home Z before home XY.");
+      }
 
     #if ENABLED(IMPROVE_HOMING_RELIABILITY)
       end_slow_homing(slow_homing);
@@ -524,6 +545,5 @@ void GcodeSuite::G28() {
       const uint8_t cv = L64XX::chain[j];
       L64xxManager.set_param((L64XX_axis_t)cv, L6470_ABS_POS, stepper.position(L64XX_axis_xref[cv]));
     }
-  #endif
   #endif
 }
