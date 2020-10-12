@@ -40,15 +40,25 @@
         mesh_bed_leveling::index_to_ypos[GRID_MAX_POINTS_Y];
 
   mesh_bed_leveling::mesh_bed_leveling() {
+    /*
     LOOP_L_N(i, GRID_MAX_POINTS_X)
       index_to_xpos[i] = MESH_MIN_X + i * (MESH_X_DIST);
     LOOP_L_N(i, GRID_MAX_POINTS_Y)
       index_to_ypos[i] = MESH_MIN_Y + i * (MESH_Y_DIST);
+    */
+    index_to_xpos[0] = -45;
+    index_to_xpos[1] = -15;
+    index_to_xpos[2] = 15;
+    index_to_xpos[3] = 45;
+
+    index_to_ypos[0] = 255;
+    index_to_ypos[1] = 285;
+    index_to_ypos[2] = 315;
+    index_to_ypos[3] = 345;
     reset();
   }
 
   void mesh_bed_leveling::reset() {
-    z_offset = 0;
     ZERO(z_values);
     #if ENABLED(EXTENSIBLE_UI)
       GRID_LOOP(x, y) ExtUI::onMeshUpdate(x, y, 0);

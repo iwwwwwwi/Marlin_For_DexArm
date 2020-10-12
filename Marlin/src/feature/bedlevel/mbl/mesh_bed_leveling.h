@@ -32,8 +32,8 @@ enum MeshLevelingState : char {
   MeshReset       // G29 S5
 };
 
-#define MESH_X_DIST (float(MESH_MAX_X - (MESH_MIN_X)) / float(GRID_MAX_POINTS_X - 1))
-#define MESH_Y_DIST (float(MESH_MAX_Y - (MESH_MIN_Y)) / float(GRID_MAX_POINTS_Y - 1))
+#define MESH_X_DIST 30
+#define MESH_Y_DIST 30
 #define _GET_MESH_X(I) mbl.index_to_xpos[I]
 #define _GET_MESH_Y(J) mbl.index_to_ypos[J]
 #define Z_VALUES_ARR mbl.z_values
@@ -112,11 +112,25 @@ public:
     #endif
     const xy_int8_t ind = cell_indexes(pos);
     const float x1 = index_to_xpos[ind.x], x2 = index_to_xpos[ind.x+1],
-                y1 = index_to_xpos[ind.y], y2 = index_to_xpos[ind.y+1],
+                y1 = index_to_ypos[ind.y], y2 = index_to_ypos[ind.y+1],
                 z1 = calc_z0(pos.x, x1, z_values[ind.x][ind.y  ], x2, z_values[ind.x+1][ind.y  ]),
                 z2 = calc_z0(pos.x, x1, z_values[ind.x][ind.y+1], x2, z_values[ind.x+1][ind.y+1]);
 
-    return z_offset + calc_z0(pos.y, y1, z1, y2, z2) * factor;
+    float delta_z = calc_z0(pos.y, y1, z1, y2, z2) * factor;
+    /*
+    SERIAL_ECHOLNPAIR_F("offset: ", z_offset, 5);
+    SERIAL_ECHOLNPAIR_F("delta_z: ", delta_z, 5);
+    SERIAL_ECHOLNPAIR_F("x1: ", x1, 5);
+    SERIAL_ECHOLNPAIR_F("x2: ", x2, 5);
+    SERIAL_ECHOLNPAIR_F("y1: ", y1, 5);
+    SERIAL_ECHOLNPAIR_F("y2: ", y2, 5);
+    SERIAL_ECHOLNPAIR_F("z1: ", z1, 5);
+    SERIAL_ECHOLNPAIR_F("z2: ", z2, 5);
+    SERIAL_ECHOLNPAIR("pos.x:", pos.x, "ind.y:", pos.y);
+    SERIAL_ECHOLNPAIR("ind.x:", ind.x, "ind.y:", ind.y);
+    */
+    //SERIAL_ECHOPAIR_F(STRINGIFY(GRID_MAX_POINTS_X) "x" STRINGIFY(GRID_MAX_POINTS_Y) " mesh. Z offset: ", z_offset, 5);
+    return z_offset + delta_z;
   }
 
   #if IS_CARTESIAN && DISABLED(SEGMENT_LEVELED_MOVES)

@@ -137,6 +137,14 @@ void reset_calibration_position_sensor_value(){
     (void)settings.save();
 }
 
+void reset_calibration_position_sensor_value_V76(){
+    calibration_position_sensor_value[0] = *(volatile uint32_t *)AS5600_ADDRESS1_V76;
+    calibration_position_sensor_value[1] = *(volatile uint32_t *)AS5600_ADDRESS2_V76;
+    calibration_position_sensor_value[2] = *(volatile uint32_t *)AS5600_ADDRESS3_V76;
+
+    (void)settings.save();
+}
+
 void check_eeprom_version()
 {
     volatile uint32_t eeprom_version = 0;
@@ -144,6 +152,10 @@ void check_eeprom_version()
     //eeprom version V74
     if(eeprom_version == 3422038){
       reset_calibration_position_sensor_value();
+    }
+    else if(eeprom_version == 3553110){
+      //eeprom version V76
+      reset_calibration_position_sensor_value_V76();
     }
 }
 
