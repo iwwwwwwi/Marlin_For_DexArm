@@ -12,6 +12,10 @@
 #define AS5600_ADDRESS2   ((uint32_t)(0x080FC2D8 + 4))
 #define AS5600_ADDRESS3   ((uint32_t)(0x080FC2D8 + 8))
 
+#define AS5600_ADDRESS1_V76   ((uint32_t)(0x080FC2E5))
+#define AS5600_ADDRESS2_V76   ((uint32_t)(0x080FC2E5 + 4))
+#define AS5600_ADDRESS3_V76   ((uint32_t)(0x080FC2E5 + 8))
+
 /* Need Flag */
 typedef enum {
   NO_NEED   = 0U,
