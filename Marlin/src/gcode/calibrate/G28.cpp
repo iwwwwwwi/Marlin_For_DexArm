@@ -320,7 +320,7 @@ void GcodeSuite::G28() {
                home_all = homeX == homeY && homeX == homeZ, // All or None
                doX = home_all || homeX, doY = home_all || homeY, doZ = home_all || homeZ;
 */
-    const bool homeX = parser.seen('X'), homeY = parser.seen('Y'), homeZ = parser.seen('Z'),
+    const bool homeX = parser.seen('X')|parser.seen('A'), homeY = parser.seen('Y')|parser.seen('B'), homeZ = parser.seen('Z')|parser.seen('C'),
                //home_all = homeX == homeY && homeX == homeZ, // All or None
                doX = homeX, doY = homeY, doZ = homeZ;
     if(!homeX&!homeY&!homeZ){
@@ -367,7 +367,7 @@ void GcodeSuite::G28() {
       if(home_z_before_xy){
         homeaxis(Y_AXIS);
       }else{
-        SERIAL_ECHOLNPAIR("Please Home Z before home XY.");
+        SERIAL_ECHOLNPAIR("Please Home C/Z before Home AB/XY.");
       }
       
 
@@ -396,7 +396,7 @@ void GcodeSuite::G28() {
         if(home_z_before_xy){
           homeaxis(X_AXIS);
         }else{
-          SERIAL_ECHOLNPAIR("Please Home Z before home XY.");
+          SERIAL_ECHOLNPAIR("Please Home C/Z before Home AB/XY.");
         }
       #endif
     }
@@ -406,7 +406,7 @@ void GcodeSuite::G28() {
       if(home_z_before_xy){
         homeaxis(Y_AXIS);
       }else{
-        SERIAL_ECHOLNPAIR("Please Home Z before home XY.");
+        SERIAL_ECHOLNPAIR("Please Home C/Z before Home AB/XY.");
       }
 
     #if ENABLED(IMPROVE_HOMING_RELIABILITY)

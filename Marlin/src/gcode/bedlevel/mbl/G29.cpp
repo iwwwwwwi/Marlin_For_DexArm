@@ -114,6 +114,7 @@ void GcodeSuite::G29() {
         #if HAS_SOFTWARE_ENDSTOPS
           soft_endstops_enabled = saved_soft_endstops_state;
         #endif
+        do_blocking_move_to_z(0);
       }
       // If there's another point to sample, move there with optional lift.
       if (mbl_probe_index < GRID_MAX_POINTS) {
