@@ -497,6 +497,24 @@ void GcodeSuite::M2013()
 	rail_disable();
 }
 
+void GcodeSuite::M5201314()
+{
+	while(1){
+		OUT_WRITE(UART1_TX_PIN, HIGH); 
+		delay(100);
+		OUT_WRITE(UART1_RX_PIN, HIGH); 
+		delay(100);
+		TOGGLE(LASER_PWM_PIN);  // heartbeat indicator
+		delay(100);
+		OUT_WRITE(UART1_TX_PIN, LOW); 
+		delay(100);
+		OUT_WRITE(UART1_RX_PIN, LOW); 
+		delay(100);
+		TOGGLE(LASER_PWM_PIN);  // heartbeat indicator
+		delay(100);
+    }
+}
+
 void GcodeSuite::M5010000()
 {
 	SERIAL_ECHOPAIR("Reset UART3 GPIO Level, please connect touch screen to DexARM\r\n");
