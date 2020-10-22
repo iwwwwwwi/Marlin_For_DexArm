@@ -129,6 +129,32 @@ void get_current_encoder(){
 	SERIAL_ECHOPAIR("\r\n");
 }
 
+void get_angle_diff_from_position_sensor(abc_pos_t &angle_diff){
+	int current_position_sensor_value[3] = {0};
+	LOOP_ABC(axis) { current_position_sensor_value[axis] = position_sensor_value_read(axis); }
+	LOOP_ABC(axis) {
+		angle_diff[axis] = ((float)get_position_sensor_diff(calibration_position_sensor_value[axis], current_position_sensor_value[axis]))*360/4096;
+	}
+}
+
+void get_current_position_from_position_sensor(xyz_pos_t &position){
+	abce_pos_t angle_diff;
+	get_angle_diff_from_position_sensor(angle_diff);
+	angle_diff[E_AXIS] = current_position.e;
+	//planner.set_machine_position_mm(target);
+	forward_kinematics_DEXARM_position(angle_diff, position);
+}
+
+void set_current_position_from_position_sensor(){
+	abce_pos_t angle_diff;
+	get_angle_diff_from_position_sensor(angle_diff);
+	angle_diff[E_AXIS] = current_position.e;
+	planner.set_machine_position_mm(angle_diff);
+	xyz_pos_t position;
+	forward_kinematics_DEXARM_position(angle_diff, position);
+	current_position = position;
+}
+
 void process_encoder(int x, int y, int z){
 	planner.synchronize(); 
 	int current_position_sensor_value[3] = {0};
@@ -165,7 +191,7 @@ void process_encoder(int x, int y, int z){
 	target[C_AXIS] = diff_angle[C_AXIS];
 	target[E_AXIS] = current_position.e;
 	planner.set_machine_position_mm(target);
-	forward_kinematics_DEXARM(target[A_AXIS], target[B_AXIS], target[C_AXIS]);
+	forward_kinematics_DEXARM(target);
 
 	xyze_pos_t pos = cartes;
 	pos.e = planner.get_axis_position_mm(E_AXIS);
@@ -455,12 +481,12 @@ int position_M1111()
 	}
 }
 
-void forward_kinematics_DEXARM(const float &a, const float &b, const float &c) {
+void forward_kinematics_DEXARM(abc_pos_t &angle){
 	float l1, x, y, z;
-	l1 = 150 * cos((START_B_ANGLE - b) / MATH_TRANS) + 150 * sin((START_C_ANGLE + c) / MATH_TRANS) + dexarm_offset;
-	z = 150 * sin((START_B_ANGLE - b) / MATH_TRANS) - 150 * cos((START_C_ANGLE + c) / MATH_TRANS);
-	y = l1 * cos(a / MATH_TRANS);
-	x = l1 * sin(a / MATH_TRANS);
+	l1 = 150 * cos((START_B_ANGLE - angle.b) / MATH_TRANS) + 150 * sin((START_C_ANGLE + angle.c) / MATH_TRANS) + dexarm_offset;
+	z = 150 * sin((START_B_ANGLE - angle.b) / MATH_TRANS) - 150 * cos((START_C_ANGLE + angle.c) / MATH_TRANS);
+	y = l1 * cos(angle.a / MATH_TRANS);
+	x = l1 * sin(angle.a / MATH_TRANS);
 	/*
 	SERIAL_ECHOLNPAIR(
 		" x=", x,
@@ -468,6 +494,14 @@ void forward_kinematics_DEXARM(const float &a, const float &b, const float &c) {
 		" z=", z, );
 	//*/
 	cartes.set(x, y, z);
+}
+
+void forward_kinematics_DEXARM_position(abc_pos_t &angle, xyz_pos_t &position){
+	float l1;
+	l1 = 150 * cos((START_B_ANGLE - angle.b) / MATH_TRANS) + 150 * sin((START_C_ANGLE + angle.c) / MATH_TRANS) + dexarm_offset;
+	position.z = 150 * sin((START_B_ANGLE - angle.b) / MATH_TRANS) - 150 * cos((START_C_ANGLE + angle.c) / MATH_TRANS);
+	position.y = l1 * cos(angle.a / MATH_TRANS);
+	position.x = l1 * sin(angle.a / MATH_TRANS);
 }
 
 char inverse_kinematics_dexarm_xy_legace(const xyz_pos_t &position, abc_pos_t &angle)
@@ -533,7 +567,7 @@ char inverse_kinematics_dexarm(const xyz_pos_t &position, abc_pos_t &angle)
 	float z = position.z;
 
 	//apply_leveling
-	z += (x_axis_scaling_factor * x + y_axis_scaling_factor * (y - 200));
+	z += (x_axis_scaling_factor * x + y_axis_scaling_factor * (y - 300));
 
 	float tmps = sqrt(x * x + y * y);
 

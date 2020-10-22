@@ -45,6 +45,8 @@ void GcodeSuite::M17() {
   else {
     LCD_MESSAGEPGM(MSG_NO_MOVE);
     enable_all_steppers();
+    position_init_flag = true;
+    set_current_position_from_position_sensor();
   }
 }
 

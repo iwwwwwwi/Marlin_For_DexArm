@@ -291,10 +291,11 @@ void get_cartesian_from_steppers() {
   #if ENABLED(DELTA)
     forward_kinematics_DELTA(planner.get_axis_positions_mm());
   #elif ENABLED(DEXARM)
-    forward_kinematics_DEXARM(
-      planner.get_axis_position_degrees(A_AXIS),
-      planner.get_axis_position_degrees(B_AXIS),
-      planner.get_axis_position_degrees(C_AXIS));
+	  abc_pos_t angle;
+	  angle.a = planner.get_axis_position_degrees(A_AXIS);
+	  angle.b = planner.get_axis_position_degrees(B_AXIS);
+	  angle.c = planner.get_axis_position_degrees(C_AXIS);
+    forward_kinematics_DEXARM(angle);
   #else
     #if IS_SCARA
       forward_kinematics_SCARA(
@@ -771,7 +772,7 @@ FORCE_INLINE void segment_idle(millis_t &next_idle_ms) {
     const xyze_float_t diff = destination - current_position;
 
     // If the move is only in Z/E don't split up the move
-    if (!diff.x && !diff.y) {
+    if (!diff.x && !diff.y&& !diff.z) {
       planner.buffer_line(destination, scaled_fr_mm_s, active_extruder);
       return false; // caller will update current_position
     }
@@ -832,6 +833,10 @@ FORCE_INLINE void segment_idle(millis_t &next_idle_ms) {
     while (--segments) {
       segment_idle(next_idle_ms);
       raw += segment_distance;
+      if (!dexarm_position_is_reachable(raw)){
+        current_position = raw;
+        return true;
+      }
       if (!planner.buffer_line(raw, scaled_fr_mm_s, active_extruder, cartesian_segment_mm
         #if ENABLED(SCARA_FEEDRATE_SCALING)
           , inv_duration
@@ -846,7 +851,7 @@ FORCE_INLINE void segment_idle(millis_t &next_idle_ms) {
         , inv_duration
       #endif
     );
-
+    current_position = destination;
     return false; // caller will update current_position
   }
 
@@ -1133,7 +1138,32 @@ void prepare_line_to_destination() {
     #endif
   ) return;
 
-  current_position = destination;
+  //current_position = destination;
+}
+
+void prepare_jump_move_to_destination(float height) {
+
+    //const float scaled_fr_mm_s = MMS_SCALED(feedrate_mm_s);
+
+    //xyze_pos_t destination_jump; 
+    //xyze_pos_t destination_move;
+    //xyze_pos_t destination_fall;
+    xyze_pos_t destination_target;
+
+    LOOP_ABC(axis) { destination_target[axis] = destination[axis]; }
+
+    destination.x = current_position.x;
+    destination.y = current_position.y;
+    destination.z = (current_position.z + height);
+    prepare_line_to_destination();
+
+    destination.x = destination_target.x;
+    destination.y = destination_target.y;
+    destination.z = destination.z;
+    prepare_fast_move_to_destination();
+
+    LOOP_ABC(axis) { destination[axis] = destination_target[axis]; }
+    prepare_line_to_destination();
 }
 
 uint8_t axes_need_homing(uint8_t axis_bits/*=0x07*/) {

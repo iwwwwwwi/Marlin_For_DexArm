@@ -253,6 +253,100 @@ void GcodeSuite::M894(void)
 	}
 }
 
+void GcodeSuite::M895(void)
+{
+	xyz_pos_t position;
+	get_current_position_from_position_sensor(position);
+	SERIAL_ECHOLNPAIR("X:", position.x, " Y:", position.y, " Z:", position.z);
+	SERIAL_EOL();
+}
+
+move_mode_t teach_play_move_mode = FAST_MODE;
+float teach_play_jump_height = 50.0;
+float teach_play_feedrate = 50.0;
+void GcodeSuite::M896(void)
+{
+	int x, y, z;
+	bool check_height_param = parser.seen('H');
+	if (check_height_param)
+	{
+		teach_play_jump_height = parser.floatval('H', 999);
+	}
+
+	bool check_feedrate_param = parser.seen('F');
+	if (check_height_param)
+	{
+		teach_play_feedrate = parser.floatval('F', 999);
+	}
+
+	bool check_mode_param = parser.seen('P');
+	if (check_mode_param)
+	{
+		switch (parser.intval('P', 999))
+		{
+		case 0:
+			teach_play_move_mode = FAST_MODE;
+			SERIAL_ECHOLNPAIR("teach&play move mode set to fast mode");
+			break;
+		case 1:
+			teach_play_move_mode = LINE_MODE;
+			SERIAL_ECHOLNPAIR("teach&play move mode set to line mode");
+			break;
+		case 2:
+			teach_play_move_mode = JUMP_MODE;
+			SERIAL_ECHOLNPAIR("teach&play move mode set to jump mode");
+			break;
+		}
+	}
+
+	bool check_param = parser.seen('X') & parser.seen('Y') & parser.seen('Z');
+	if (check_param)
+	{
+		const feedRate_t old_feedrate = feedrate_mm_s;
+		feedrate_mm_s = teach_play_feedrate;
+		if (!position_init_flag)
+		{
+    		enable_all_steppers();
+    		position_init_flag = true;
+			set_current_position_from_position_sensor();
+		}
+		destination.x = parser.floatval('X', 999);
+		destination.y = parser.floatval('Y', 999);
+		destination.z = parser.floatval('Z', 999);
+		destination.e = 0;
+		switch(teach_play_move_mode)
+		{
+			case FAST_MODE:
+				prepare_fast_move_to_destination();
+				break;
+			case LINE_MODE:
+				prepare_line_to_destination();
+				break;
+			case JUMP_MODE:
+				prepare_jump_move_to_destination(teach_play_jump_height);
+				break;
+		}
+	}
+
+	if((!check_height_param)&(!check_feedrate_param)&(!check_param)){
+		switch(teach_play_move_mode)
+		{
+			case FAST_MODE:
+				teach_play_move_mode = FAST_MODE;
+				SERIAL_ECHOLNPAIR("teach&play move mode is fast mode");
+				break;
+			case LINE_MODE:
+				teach_play_move_mode = LINE_MODE;
+				SERIAL_ECHOLNPAIR("teach&play move mode is line mode");
+				break;
+			case JUMP_MODE:
+				teach_play_move_mode = JUMP_MODE;
+				SERIAL_ECHOLNPAIR("teach&play move mode is jump mode");
+				break;
+		}		
+	}
+}
+
 void GcodeSuite::M1000()
 {
 	planner.synchronize(); 
@@ -330,10 +424,12 @@ void GcodeSuite::M1113()
 
 void GcodeSuite::M1114()
 {
-    forward_kinematics_DEXARM(
-      planner.get_axis_position_degrees(A_AXIS),
-      planner.get_axis_position_degrees(B_AXIS),
-      planner.get_axis_position_degrees(C_AXIS));
+	abc_pos_t angle;
+	//LOOP_ABC(axis) { angle[axis] = planner.get_axis_position_degrees(axis);}
+	angle.a = planner.get_axis_position_degrees(A_AXIS);
+	angle.b = planner.get_axis_position_degrees(B_AXIS);
+	angle.c = planner.get_axis_position_degrees(C_AXIS);
+    forward_kinematics_DEXARM(angle);
 }
 
 void GcodeSuite::M2000()

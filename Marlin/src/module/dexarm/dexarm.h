@@ -26,6 +26,7 @@ extern bool INVERT_E0_DIR;
 typedef enum {
     FAST_MODE,
     LINE_MODE,
+    JUMP_MODE,
 }move_mode_t;
 
 extern move_mode_t G0_MOVE_MODE;
@@ -35,13 +36,16 @@ void module_position_init();
 void update_dexarm_offset(void);
 
 void get_current_encoder();
+void get_current_position_from_position_sensor(xyz_pos_t &position);
+void set_current_position_from_position_sensor();
 void process_encoder(int x, int y, int z);
 
 int position_M1111();
 int m1112_position(xyz_pos_t &position);
 int m1113_position(xyz_pos_t &position);
 
-void forward_kinematics_DEXARM(const float &a, const float &b, const float &c);
+void forward_kinematics_DEXARM(abc_pos_t &angle);
+void forward_kinematics_DEXARM_position(abc_pos_t &angle, xyz_pos_t &position);
 void rotate_angle_diff(abc_pos_t &angle_abc);
 void inverse_kinematics(const xyz_pos_t &raw);
 
