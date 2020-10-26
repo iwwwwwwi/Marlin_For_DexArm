@@ -25,6 +25,7 @@
 #if ENABLED(PARK_HEAD_ON_PAUSE)
 
 #include "../../gcode.h"
+#include "../../queue.h"
 #include "../../parser.h"
 #include "../../../feature/pause.h"
 #include "../../../module/motion.h"
@@ -55,6 +56,8 @@
  *    Z = override Z raise
  */
 void GcodeSuite::M125() {
+  queue.inject_P(PSTR("M1111\nG91\nG0 X300 Y-223.55 Z-20\nG0 X-105 Z-150\nG90\n"));
+  /*
   // Initial retract before move to filament change position
   const float retract = -ABS(parser.seen('L') ? parser.value_axis_units(E_AXIS) : 0
     #ifdef PAUSE_PARK_RETRACT_LENGTH
@@ -97,6 +100,7 @@ void GcodeSuite::M125() {
       resume_print(0, 0, PAUSE_PARK_RETRACT_LENGTH, 0);
     }
   }
+  */
 }
 
 #endif // PARK_HEAD_ON_PAUSE
