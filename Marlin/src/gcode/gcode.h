@@ -660,6 +660,7 @@ private:
   static void M2013();
   static void M2100();
   static void M2101();
+  static void M2102();
   static void M5201314();
   static void M5010000();
 

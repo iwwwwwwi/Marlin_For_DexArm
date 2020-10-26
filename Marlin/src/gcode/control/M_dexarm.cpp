@@ -517,41 +517,31 @@ uint8_t front_rotation_init_flag = 0;
 //front rotation init
 void GcodeSuite::M2100()
 {
-	int init_speed = 20;
-	int init_position = 10;
+	// int init_speed = 20;
+	// int init_position = 10;
 	front_rotation_init();
-	set_motion_speed(SERO_1, init_speed);
-	set_pos(SERO_1, init_position);
-	pos_demo_test();
-	front_rotation_init_flag = 1;
+	// set_motion_speed(SERO_1, init_speed);
+	// set_pos(SERO_1, init_position);
+	// pos_demo_test();
+	clear_front_val();
+	// front_rotation_init_flag = 0;
+	set_enable(SERO_1,0);
+	HAL_Delay(100);	
 }
-
+extern uint8_t front_button_flag;
 void GcodeSuite::M2101()
 {
 	static uint16_t speed = 50, positon = 500;
 	static uint16_t torque_val = 1023;
+	static uint8_t e_flag = 0;
+	front_button_flag = 0;
 	
 	if(!front_rotation_init_flag){
 		front_rotation_init();
 		MYSERIAL0.println("front rotation init ok......\r\n");
 		front_rotation_init_flag = 1;
 	}
-
-	bool s_seen = parser.seen('S');
-	if(s_seen){
-		speed = parser.intval('S');
-		speed = scope_limit(1,speed,1023);
-		set_motion_speed(SERO_1, speed);
-		HAL_Delay(100);		
-	}
-
-	bool t_seen = parser.seen('T');
-	if(t_seen){
-		torque_val = parser.intval('T');
-		torque_val = scope_limit(1,torque_val,1023);
-		set_torque_limt(SERO_1,torque_val);
-		HAL_Delay(100);	
-	}
+	stm32_interrupt_disable(KEY_GPIO_Port,KEY_Pin);
 
 	bool p_seen = parser.seen('P');
 	if(p_seen){
@@ -561,19 +551,42 @@ void GcodeSuite::M2101()
 		HAL_Delay(100);		
 	}
 
+	bool e_seen = parser.seen('E');
+	if(e_seen){
+		e_flag = parser.intval('E');
+		set_enable(SERO_1,e_flag);
+		HAL_Delay(100);	
+	}	
+
 	positon = read_pos(SERO_1);
 	HAL_Delay(100);
-	speed = read_motion_speed(SERO_1);
-	HAL_Delay(100);	
+
 
 	char str[30];
 	memset(&str,0,30);
 	sprintf(str,"surrent positon = %d",positon);
 	MYSERIAL0.println(str);
-	sprintf(str,"surrent speed = %d",speed);
-	MYSERIAL0.println(str);
 
 	MYSERIAL0.println("ok");
+}
+//update front rotation model bin
+uint16_t front_rotation_model_bin_size = 0;
+void GcodeSuite::M2102()
+{
+	uint8_t update_step = 0;//defult enter boot
+	
+	bool update_flag = parser.seen('U');
+	if(update_flag){
+		update_step = parser.intval('U');	
+		if(update_step == REV_SIZE)
+		{
+			front_rotation_model_bin_size = parser.intval('S');	
+		}
+		
+	}
+
+	update_rotation_model(update_step,front_rotation_model_bin_size,(uint8_t *)rev_buffer);
+
 }
 
 void GcodeSuite::M2012()

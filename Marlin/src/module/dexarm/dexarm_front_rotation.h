@@ -50,6 +50,13 @@ enum sero_x
 	SERO_5,
 };
 
+enum sero_update
+{
+	ENTER_BOOT	=	1,
+	REV_SIZE,
+	REV_BIN,
+};
+
 void front_rotation_init(void);
 bool set_pos(int id,int val);
 void pos_demo_test();
@@ -59,3 +66,11 @@ bool set_enable(int id,int val);
 uint16_t set_torque_limt(uint8_t id,int val);
 uint16_t read_motion_speed(uint8_t id);
 uint16_t read_pos(uint8_t id);
+void update_rotation_model(uint8_t flag,uint16_t bin_size,uint8_t bin[]);
+char rotation_model_rev_bin(char c);
+
+extern char rev_buffer[500];
+extern void clear_front_val(void);
+
+#define KEY_Pin GPIO_PIN_10
+#define KEY_GPIO_Port GPIOA
