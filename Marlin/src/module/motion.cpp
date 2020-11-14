@@ -774,6 +774,7 @@ FORCE_INLINE void segment_idle(millis_t &next_idle_ms) {
     // If the move is only in Z/E don't split up the move
     if (!diff.x && !diff.y&& !diff.z) {
       planner.buffer_line(destination, scaled_fr_mm_s, active_extruder);
+      current_position = destination;
       return false; // caller will update current_position
     }
 
@@ -834,7 +835,7 @@ FORCE_INLINE void segment_idle(millis_t &next_idle_ms) {
       segment_idle(next_idle_ms);
       raw += segment_distance;
       if (!dexarm_position_is_reachable(raw)){
-        current_position = raw;
+        current_position = (raw - segment_distance);
         return true;
       }
       if (!planner.buffer_line(raw, scaled_fr_mm_s, active_extruder, cartesian_segment_mm
