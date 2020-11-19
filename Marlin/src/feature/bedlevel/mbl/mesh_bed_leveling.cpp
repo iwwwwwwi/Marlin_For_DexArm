@@ -46,15 +46,15 @@
     LOOP_L_N(i, GRID_MAX_POINTS_Y)
       index_to_ypos[i] = MESH_MIN_Y + i * (MESH_Y_DIST);
     */
-    index_to_xpos[0] = -45;
-    index_to_xpos[1] = -15;
-    index_to_xpos[2] = 15;
-    index_to_xpos[3] = 45;
+    index_to_xpos[0] = -90;
+    index_to_xpos[1] = -30;
+    index_to_xpos[2] = 30;
+    index_to_xpos[3] = 90;
 
-    index_to_ypos[0] = 255;
-    index_to_ypos[1] = 285;
-    index_to_ypos[2] = 315;
-    index_to_ypos[3] = 345;
+    index_to_ypos[0] = 209;
+    index_to_ypos[1] = 266;
+    index_to_ypos[2] = 324;
+    index_to_ypos[3] = 382;
     reset();
   }
 

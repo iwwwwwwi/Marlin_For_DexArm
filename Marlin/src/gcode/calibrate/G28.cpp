@@ -326,7 +326,7 @@ void GcodeSuite::G28() {
     if(!homeX&!homeY&!homeZ){
       xyz_pos_t position;
       position[X_AXIS] = 0;
-		  position[Y_AXIS] = 300;
+		  position[Y_AXIS] = 291;
 		  position[Z_AXIS] = 0;
 		  m1112_position(position);
       return;

@@ -29,7 +29,7 @@ void re_calibration(float target_distance, float actual_distance)
 	angle_cos = target_distance / 600;
 	MYSERIAL0.println("angle: ");
 	MYSERIAL0.println(angle_cos);
-	front_module_offset -= 300 - ((actual_distance / 2) / angle_cos);
+	front_module_offset -= 291 - ((actual_distance / 2) / angle_cos);
 	MYSERIAL0.println("Re Calibration OFFSET_FRONT: ");
 	MYSERIAL0.println(front_module_offset);
 }
@@ -394,7 +394,7 @@ void GcodeSuite::M1112()
 	else
 	{
 		position[X_AXIS] = 0;
-		position[Y_AXIS] = 300;
+		position[Y_AXIS] = 291;
 		position[Z_AXIS] = 0;
 		m1112_position(position);
 	}
@@ -416,7 +416,7 @@ void GcodeSuite::M1113()
 	else
 	{
 		position[X_AXIS] = 0;
-		position[Y_AXIS] = 300;
+		position[Y_AXIS] = 291;
 		position[Z_AXIS] = 0;
 		m1113_position(position);
 	}
